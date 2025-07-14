@@ -58,13 +58,37 @@ func main() {
 
 	/* ────────────────  Routing ──────────────────  */
 	root := mux.NewRouter()
+	root.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			log.Printf("[CADS] Incoming request: %s %s", r.Method, r.URL.Path)
+			log.Printf("Headers: %v", r.Header)
+			log.Printf("Query: %v", r.URL.RawQuery)
+			next.ServeHTTP(w, r)
+		})
+	})
 	root.Use(loggingMiddleware)
 
 	// WebAuthn endpoints
-	root.HandleFunc("/auth/register/begin", wa.BeginRegistration).Methods("POST")
-	root.HandleFunc("/auth/register/finish", wa.FinishRegistration).Methods("POST")
-	root.HandleFunc("/auth/login/begin", wa.BeginLogin).Methods("POST")
-	root.HandleFunc("/auth/login/finish", wa.FinishLogin).Methods("POST")
+	root.HandleFunc("/auth/register/begin", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("[CADS] /auth/register/begin endpoint hit")
+		log.Printf("Body: %v", r.ContentLength)
+		wa.BeginRegistration(w, r)
+	}).Methods("POST")
+	root.HandleFunc("/auth/register/finish", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("[CADS] /auth/register/finish endpoint hit")
+		log.Printf("Body: %v", r.ContentLength)
+		wa.FinishRegistration(w, r)
+	}).Methods("POST")
+	root.HandleFunc("/auth/login/begin", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("[CADS] /auth/login/begin endpoint hit")
+		log.Printf("Body: %v", r.ContentLength)
+		wa.BeginLogin(w, r)
+	}).Methods("POST")
+	root.HandleFunc("/auth/login/finish", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("[CADS] /auth/login/finish endpoint hit")
+		log.Printf("Body: %v", r.ContentLength)
+		wa.FinishLogin(w, r)
+	}).Methods("POST")
 
 	// Microcell endpoints
 	root.HandleFunc("/microcell/spawn", pool.SpawnHandler).Methods("POST")
@@ -79,7 +103,7 @@ func main() {
 
 	// CORS setup
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:5173", "http://localhost:3000"},
+		AllowedOrigins:   []string{"http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:3000"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"*"},
 		AllowCredentials: true,

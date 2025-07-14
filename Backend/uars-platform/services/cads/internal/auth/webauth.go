@@ -1,8 +1,10 @@
 package auth
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -22,7 +24,7 @@ func NewWebAuthnHandler(us *store.MemoryUserStore) *WebAuthnHandler {
 	wa, err := webauthn.New(&webauthn.Config{
 		RPDisplayName: "UARS7",
 		RPID:          "localhost",
-		RPOrigin:      "http://localhost:5173",
+		RPOrigin:      "http://localhost:5174",
 	})
 	if err != nil {
 		log.Fatalf("WebAuthn init error: %v", err)
@@ -36,9 +38,16 @@ func (h *WebAuthnHandler) BeginRegistration(w http.ResponseWriter, r *http.Reque
 	start := time.Now()
 	log.Printf("[CALL] %s %s – BeginRegistration", r.Method, r.URL.Path)
 
-	u := &store.User{ID: []byte("admin"), Name: "admin", DisplayName: "Admin"}
-	h.userStore.SaveUser(u)
-
+	var req struct{ Username string }
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Username == "" {
+		respondErr(w, r, http.StatusBadRequest, "missing username")
+		return
+	}
+	u := h.userStore.GetUser(req.Username)
+	if u == nil {
+		u = &store.User{ID: []byte(req.Username), Name: req.Username, DisplayName: req.Username}
+		h.userStore.SaveUser(u)
+	}
 	opts, sd, err := h.wa.BeginRegistration(u)
 	if err != nil {
 		respondErr(w, r, http.StatusInternalServerError, "begin-reg error: "+err.Error())
@@ -57,7 +66,20 @@ func (h *WebAuthnHandler) FinishRegistration(w http.ResponseWriter, r *http.Requ
 	start := time.Now()
 	log.Printf("[CALL] %s %s – FinishRegistration", r.Method, r.URL.Path)
 
-	u := h.userStore.GetUser("admin")
+	// Parse the body as a map to extract username and attestation
+	var payload struct {
+		Username    string          `json:"username"`
+		Attestation json.RawMessage `json:"attestation"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		respondErr(w, r, http.StatusBadRequest, "invalid payload")
+		return
+	}
+	if payload.Username == "" {
+		respondErr(w, r, http.StatusBadRequest, "missing username")
+		return
+	}
+	u := h.userStore.GetUser(payload.Username)
 	if u == nil {
 		respondErr(w, r, http.StatusNotFound, "user missing")
 		return
@@ -67,6 +89,11 @@ func (h *WebAuthnHandler) FinishRegistration(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		return // loadSession already logged & wrote response
 	}
+
+	// Debug: log the attestation payload
+	log.Printf("[DEBUG] Received attestation payload: %s", string(payload.Attestation))
+	// Replace r.Body with attestation only
+	r.Body = io.NopCloser(bytes.NewReader(payload.Attestation))
 
 	cred, err := h.wa.FinishRegistration(u, *sd, r)
 	if err != nil {
@@ -87,7 +114,12 @@ func (h *WebAuthnHandler) BeginLogin(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	log.Printf("[CALL] %s %s – BeginLogin", r.Method, r.URL.Path)
 
-	u := h.userStore.GetUser("admin")
+	var req struct{ Username string }
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Username == "" {
+		respondErr(w, r, http.StatusBadRequest, "missing username")
+		return
+	}
+	u := h.userStore.GetUser(req.Username)
 	if u == nil {
 		respondErr(w, r, http.StatusNotFound, "user missing")
 		return
@@ -111,7 +143,12 @@ func (h *WebAuthnHandler) FinishLogin(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	log.Printf("[CALL] %s %s – FinishLogin", r.Method, r.URL.Path)
 
-	u := h.userStore.GetUser("admin")
+	var req struct{ Username string }
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Username == "" {
+		respondErr(w, r, http.StatusBadRequest, "missing username")
+		return
+	}
+	u := h.userStore.GetUser(req.Username)
 	if u == nil {
 		respondErr(w, r, http.StatusNotFound, "user missing")
 		return

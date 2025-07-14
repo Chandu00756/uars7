@@ -1,5 +1,5 @@
 # ADCF (Autonomous Data Capsule Fabric) Service
-
+<!-- lint: MD022, MD032, MD031, MD040 fixed -->
 **Status**: Production Ready | **Version**: 1.0.0 | **Security Level**: Military Grade
 
 ## Overview
@@ -9,6 +9,7 @@ The Autonomous Data Capsule Fabric (ADCF) is a critical component of the U-ARS 7
 ## Features
 
 ### 🔐 Military-Grade Security
+
 - **Dual Encryption**: AES-256-GCM and ChaCha20-Poly1305 algorithms
 - **Digital Signatures**: Ed25519 cryptographic signatures
 - **Key Derivation**: Scrypt-based secure key generation
@@ -16,6 +17,7 @@ The Autonomous Data Capsule Fabric (ADCF) is a critical component of the U-ARS 7
 - **Device Attestation**: Hardware-based device verification
 
 ### 📋 Policy Engine
+
 - **WASM-based Policies**: High-performance policy execution
 - **Dynamic Evaluation**: Real-time policy assessment
 - **Context-aware Access**: Situational access control
@@ -23,6 +25,7 @@ The Autonomous Data Capsule Fabric (ADCF) is a critical component of the U-ARS 7
 - **Version Control**: Policy versioning and rollback
 
 ### 📊 Comprehensive Monitoring
+
 - **Real-time Telemetry**: Custom metrics collection
 - **Audit Logging**: Immutable audit trail
 - **Performance Metrics**: System health monitoring
@@ -30,14 +33,16 @@ The Autonomous Data Capsule Fabric (ADCF) is a critical component of the U-ARS 7
 - **Prometheus Compatible**: Standard metrics format
 
 ### 🌐 API Interfaces
+
 - **REST API**: Full CRUD operations with OpenAPI 3.0 spec
 - **GraphQL API**: Flexible querying and real-time subscriptions
 - **WebSocket**: Real-time event streaming
 - **gRPC**: High-performance service communication
 
 ## Quick Start
-
+<!-- lint: MD022, MD032 fixed -->
 ### Prerequisites
+
 - Go 1.22+
 - PostgreSQL 16+
 - Docker (optional)
@@ -45,12 +50,14 @@ The Autonomous Data Capsule Fabric (ADCF) is a critical component of the U-ARS 7
 ### Installation
 
 1. **Clone and Setup**
+
 ```bash
 cd services/adcf
 go mod download
 ```
 
 2. **Database Setup**
+
 ```bash
 # Create database
 createdb uars_adcf
@@ -60,12 +67,14 @@ psql -d uars_adcf -f dev/schema.sql
 ```
 
 3. **Environment Configuration**
+
 ```bash
 cp dev/.env.example .env
 # Edit .env with your configuration
 ```
 
 4. **Run Service**
+
 ```bash
 go run cmd/server/main.go
 ```
@@ -84,44 +93,51 @@ go run cmd/server/main.go
 | `ENVIRONMENT` | Deployment environment | `development` | No |
 
 ### Database Configuration
-
+<!-- lint: MD032 fixed -->
 The service requires PostgreSQL 16+ with the following extensions:
+
 - `pgcrypto` - Cryptographic functions
 - `uuid-ossp` - UUID generation
 
 ## API Documentation
-
+<!-- lint: MD022 fixed -->
 ### REST API
+
 - **Base URL**: `http://localhost:8080/api/v1`
 - **OpenAPI Spec**: Available at `/docs/adc-api.yaml`
 - **Interactive Docs**: Available at `/swagger/` (when enabled)
-
+<!-- lint: MD031, MD040 fixed -->
 ### GraphQL API
+
 - **Endpoint**: `http://localhost:8080/graphql`
 - **Schema**: Available at `/docs/gql-schema.graphql`
 - **Playground**: Available at `/graphql` (development only)
-
+<!-- lint: MD031, MD040 fixed -->
 ### Key Endpoints
-
+<!-- lint: MD022 fixed -->
 #### Capsules
+
 - `POST /api/v1/capsules` - Create capsule
 - `GET /api/v1/capsules/{id}` - Get capsule
 - `POST /api/v1/capsules/{id}/access` - Access capsule data
 - `DELETE /api/v1/capsules/{id}/revoke` - Revoke capsule
 
 #### Policies
+
 - `POST /api/v1/policies` - Create policy
 - `GET /api/v1/policies` - List policies
 - `PUT /api/v1/policies/{id}` - Update policy
 - `POST /api/v1/policies/validate` - Validate policy
 
 #### Audit
+
 - `GET /api/v1/audit` - Get audit logs
 - `GET /api/v1/audit/export` - Export audit data
 
 ## Security Features
-
+<!-- lint: MD022 fixed -->
 ### Encryption
+
 ```go
 // Dual encryption support
 type EncryptionConfig struct {
@@ -131,22 +147,24 @@ type EncryptionConfig struct {
 ```
 
 ### Access Control
+
 - **Intent Tokens**: Cryptographically signed access intentions
 - **Device Attestation**: Hardware-based device verification
 - **Context Evaluation**: Dynamic access policies
 - **Rate Limiting**: Request throttling and abuse prevention
 
 ### Audit Trail
+
 - **Immutable Logs**: Cryptographically secured audit entries
 - **Complete Coverage**: All operations logged
 - **Retention Policies**: Configurable log retention
 - **Export Capabilities**: Compliance reporting
 
 ## Architecture
-
+<!-- lint: MD022 fixed -->
 ### Components
 
-```
+```text
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   REST API      │    │   GraphQL API   │    │   gRPC API      │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
@@ -177,6 +195,7 @@ type EncryptionConfig struct {
 ## Development
 
 ### Project Structure
+
 ```
 services/adcf/
 ├── cmd/server/           # Main application entry
@@ -222,6 +241,7 @@ go test -v -tags=security ./tests/security/...
 ## Deployment
 
 ### Docker
+
 ```bash
 docker run -d \
   --name adcf-service \
@@ -232,6 +252,7 @@ docker run -d \
 ```
 
 ### Kubernetes
+
 ```bash
 # Apply configurations
 kubectl apply -f deployments/k8s/
@@ -241,6 +262,7 @@ kubectl get pods -l app=adcf
 ```
 
 ### Helm
+
 ```bash
 # Install chart
 helm install adcf deployments/helm/adcf/
@@ -252,16 +274,19 @@ helm upgrade adcf deployments/helm/adcf/
 ## Monitoring
 
 ### Health Checks
+
 - `/health` - Basic health endpoint
 - `/health/ready` - Readiness probe
 - `/health/live` - Liveness probe
 
 ### Metrics
+
 - `/metrics` - Prometheus-compatible metrics
 - Custom metrics for capsule operations
 - Performance and security metrics
 
 ### Logging
+
 - Structured JSON logging with zerolog
 - Configurable log levels
 - Correlation IDs for request tracing
@@ -269,6 +294,7 @@ helm upgrade adcf deployments/helm/adcf/
 ## Security Considerations
 
 ### Production Deployment
+
 1. **TLS Configuration**: Always use TLS 1.3+ in production
 2. **Key Management**: Use proper key rotation and HSM integration
 3. **Network Security**: Deploy within secured network perimeters
@@ -276,6 +302,7 @@ helm upgrade adcf deployments/helm/adcf/
 5. **Monitoring**: Enable comprehensive security monitoring
 
 ### Compliance
+
 - **NIST Standards**: Follows NIST cryptographic guidelines
 - **FIPS 140-2**: Compatible with FIPS-approved algorithms
 - **Zero Trust**: Implements zero-trust security principles
@@ -286,24 +313,28 @@ helm upgrade adcf deployments/helm/adcf/
 ### Common Issues
 
 1. **Database Connection**
+
    ```bash
    # Check database connectivity
    psql $DATABASE_URL -c "SELECT version();"
    ```
 
 2. **Permission Errors**
+
    ```bash
    # Verify database permissions
    psql $DATABASE_URL -c "SELECT current_user, current_database();"
    ```
 
 3. **Encryption Errors**
+
    ```bash
    # Verify encryption key format
    echo $ENCRYPTION_KEY | base64 -d | wc -c  # Should be 32 bytes
    ```
 
 ### Debug Mode
+
 ```bash
 # Enable debug logging
 export LOG_LEVEL=debug
@@ -320,6 +351,7 @@ go run cmd/server/main.go
 ## Support
 
 For technical support and security issues:
+
 - **Security Issues**: Report immediately to security team
 - **Bug Reports**: Use issue tracking system
 - **Feature Requests**: Submit through proper channels

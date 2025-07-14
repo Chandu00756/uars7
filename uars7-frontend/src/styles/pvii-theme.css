@@ -1,0 +1,27 @@
+/* ─────────── Portal VII token sheet ─────────── */
+:root {
+  --pvii-primary   : #1B263B;
+  --pvii-secondary : #415A77;
+  --pvii-accent    : #FF7F50;
+  --pvii-bg        : #F4F6F8;
+  --pvii-paper     : #FFFFFF;
+  --pvii-radius-4  : 4px;
+  --pvii-radius-8  : 8px;
+  --pvii-radius-12 : 12px;
+  --pvii-radius-14 : 14px;
+  --pvii-shadow    : 0 4px 16px rgba(27,38,59,.12);
+  --pvii-blur      : 6px;
+}
+
+/* ─────────── helper / effect classes ─────────── */
+.glassmorphism {
+  -webkit-backdrop-filter: blur(var(--pvii-blur));
+  backdrop-filter        : blur(var(--pvii-blur));
+  background             : rgba(255,255,255,.25);
+  border                 : 1px solid rgba(255,255,255,.3);
+}
+
+.kpi-card       { transition: transform .14s cubic-bezier(.4,0,.2,1); }
+.kpi-card:hover { transform : scale(1.03); }
+
+.notification-dot { animation: pulseOpacity 1.2s linear infinite; }

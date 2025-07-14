@@ -20,7 +20,6 @@ The UARS-7 platform is a comprehensive, enterprise-grade backend system designed
 
 ## Quick Start
 
-```bash
 # Build all services
 make build-all
 
@@ -32,7 +31,7 @@ make test-all
 
 # Deploy to production
 make deploy-prod
-```
+```text
 
 ## Directory Structure
 
@@ -51,14 +50,4 @@ uars-platform/
 └── docs/               # Architecture decisions, runbooks, guides
 ```
 
-## Development
-
-See [docs/development.md](docs/development.md) for detailed development guidelines.
-
-## Security
-
-See [security/README.md](security/README.md) for security policies and procedures.
-
-## License
-
-Proprietary - UARS-7 Platform
+```bash
