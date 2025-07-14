@@ -1,0 +1,499 @@
+# GraphQL Schema for ADCF (Autonomous Data Capsule Fabric)
+
+"""
+Root Query type for the ADCF GraphQL API
+"""
+type Query {
+  """
+  Get capsule by ID
+  """
+  capsule(id: ID!): Capsule
+  
+  """
+  List capsules with optional filtering
+  """
+  capsules(
+    limit: Int = 50
+    offset: Int = 0
+    status: CapsuleStatus
+    policyId: ID
+  ): CapsuleConnection!
+  
+  """
+  Get policy by ID
+  """
+  policy(id: ID!): Policy
+  
+  """
+  List policies
+  """
+  policies(
+    limit: Int = 50
+    offset: Int = 0
+    active: Boolean
+  ): PolicyConnection!
+  
+  """
+  Get audit logs with filtering
+  """
+  auditLogs(
+    limit: Int = 100
+    offset: Int = 0
+    eventType: String
+    capsuleId: ID
+    userId: String
+    from: DateTime
+    to: DateTime
+  ): AuditLogConnection!
+  
+  """
+  Get system metrics and status
+  """
+  systemStatus: SystemStatus!
+  
+  """
+  Search across capsules and policies
+  """
+  search(
+    query: String!
+    types: [SearchType!]
+    limit: Int = 20
+  ): SearchConnection!
+}
+
+"""
+Root Mutation type for ADCF operations
+"""
+type Mutation {
+  """
+  Create a new data capsule
+  """
+  createCapsule(input: CreateCapsuleInput!): CreateCapsulePayload!
+  
+  """
+  Access a capsule (decrypt and retrieve data)
+  """
+  accessCapsule(input: AccessCapsuleInput!): AccessCapsulePayload!
+  
+  """
+  Revoke access to a capsule
+  """
+  revokeCapsule(id: ID!, reason: String): RevokeCapsulePayload!
+  
+  """
+  Update capsule metadata
+  """
+  updateCapsule(input: UpdateCapsuleInput!): UpdateCapsulePayload!
+  
+  """
+  Create a new access policy
+  """
+  createPolicy(input: CreatePolicyInput!): CreatePolicyPayload!
+  
+  """
+  Update an existing policy
+  """
+  updatePolicy(input: UpdatePolicyInput!): UpdatePolicyPayload!
+  
+  """
+  Validate a policy document
+  """
+  validatePolicy(input: ValidatePolicyInput!): ValidatePolicyPayload!
+}
+
+"""
+Root Subscription type for real-time updates
+"""
+type Subscription {
+  """
+  Subscribe to capsule events
+  """
+  capsuleEvents(capsuleId: ID): CapsuleEvent!
+  
+  """
+  Subscribe to audit events
+  """
+  auditEvents(userId: String): AuditEvent!
+  
+  """
+  Subscribe to system alerts
+  """
+  systemAlerts: SystemAlert!
+}
+
+"""
+Data capsule type
+"""
+type Capsule {
+  id: ID!
+  dataHash: String!
+  policyId: ID!
+  policy: Policy!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  createdBy: String!
+  accessCount: Int!
+  lastAccessed: DateTime
+  status: CapsuleStatus!
+  expiryDate: DateTime
+  metadata: JSON
+  permissions: CapsulePermissions!
+  auditLogs: [AuditLog!]!
+}
+
+"""
+Access policy type
+"""
+type Policy {
+  id: ID!
+  name: String!
+  description: String
+  policyDocument: JSON!
+  schemaVersion: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  createdBy: String!
+  active: Boolean!
+  capsules: [Capsule!]!
+  validationErrors: [PolicyValidationError!]!
+}
+
+"""
+Audit log entry
+"""
+type AuditLog {
+  id: ID!
+  eventType: String!
+  capsuleId: ID
+  capsule: Capsule
+  userId: String!
+  ipAddress: String
+  userAgent: String
+  eventData: JSON
+  result: AuditResult!
+  timestamp: DateTime!
+  sessionId: String
+  requestId: String
+  geoLocation: String
+}
+
+"""
+System status information
+"""
+type SystemStatus {
+  uptime: String!
+  version: String!
+  environment: String!
+  componentsStatus: [ComponentStatus!]!
+  metrics: SystemMetrics!
+  healthChecks: [HealthCheck!]!
+}
+
+"""
+Component status
+"""
+type ComponentStatus {
+  name: String!
+  status: ComponentHealth!
+  message: String
+  lastCheck: DateTime!
+}
+
+"""
+System metrics
+"""
+type SystemMetrics {
+  totalRequests: Int!
+  activeCapsules: Int!
+  totalPolicies: Int!
+  encryptionOps: Int!
+  policyEvaluations: Int!
+  auditEvents: Int!
+  errorCount: Int!
+  memoryUsageMB: Float!
+  goroutines: Int!
+}
+
+"""
+Health check result
+"""
+type HealthCheck {
+  name: String!
+  status: HealthStatus!
+  duration: String!
+  error: String
+}
+
+"""
+Capsule permissions
+"""
+type CapsulePermissions {
+  read: Boolean!
+  write: Boolean!
+  share: Boolean!
+  delete: Boolean!
+  admin: Boolean!
+}
+
+"""
+Policy validation error
+"""
+type PolicyValidationError {
+  field: String!
+  message: String!
+  severity: ValidationSeverity!
+}
+
+"""
+Real-time capsule event
+"""
+type CapsuleEvent {
+  type: CapsuleEventType!
+  capsule: Capsule!
+  user: String!
+  timestamp: DateTime!
+  metadata: JSON
+}
+
+"""
+Real-time audit event
+"""
+type AuditEvent {
+  type: String!
+  data: JSON!
+  timestamp: DateTime!
+}
+
+"""
+System alert
+"""
+type SystemAlert {
+  id: ID!
+  type: AlertType!
+  severity: AlertSeverity!
+  message: String!
+  component: String
+  timestamp: DateTime!
+  resolved: Boolean!
+}
+
+"""
+Search result
+"""
+union SearchResult = Capsule | Policy
+
+"""
+Connection types for pagination
+"""
+type CapsuleConnection {
+  edges: [CapsuleEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type CapsuleEdge {
+  node: Capsule!
+  cursor: String!
+}
+
+type PolicyConnection {
+  edges: [PolicyEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type PolicyEdge {
+  node: Policy!
+  cursor: String!
+}
+
+type AuditLogConnection {
+  edges: [AuditLogEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type AuditLogEdge {
+  node: AuditLog!
+  cursor: String!
+}
+
+type SearchConnection {
+  edges: [SearchEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type SearchEdge {
+  node: SearchResult!
+  cursor: String!
+  score: Float!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+"""
+Input types
+"""
+input CreateCapsuleInput {
+  data: String!
+  policyId: ID!
+  metadata: JSON
+  expiryDate: DateTime
+}
+
+input AccessCapsuleInput {
+  id: ID!
+  purpose: String!
+  context: JSON
+}
+
+input UpdateCapsuleInput {
+  id: ID!
+  metadata: JSON
+  expiryDate: DateTime
+}
+
+input CreatePolicyInput {
+  name: String!
+  description: String
+  policyDocument: JSON!
+}
+
+input UpdatePolicyInput {
+  id: ID!
+  name: String
+  description: String
+  policyDocument: JSON
+  active: Boolean
+}
+
+input ValidatePolicyInput {
+  policyDocument: JSON!
+}
+
+"""
+Payload types
+"""
+type CreateCapsulePayload {
+  capsule: Capsule
+  errors: [Error!]!
+}
+
+type AccessCapsulePayload {
+  data: String
+  accessToken: String
+  errors: [Error!]!
+}
+
+type RevokeCapsulePayload {
+  capsule: Capsule
+  errors: [Error!]!
+}
+
+type UpdateCapsulePayload {
+  capsule: Capsule
+  errors: [Error!]!
+}
+
+type CreatePolicyPayload {
+  policy: Policy
+  errors: [Error!]!
+}
+
+type UpdatePolicyPayload {
+  policy: Policy
+  errors: [Error!]!
+}
+
+type ValidatePolicyPayload {
+  valid: Boolean!
+  errors: [PolicyValidationError!]!
+  warnings: [PolicyValidationError!]!
+}
+
+"""
+Error type
+"""
+type Error {
+  field: String
+  message: String!
+  code: String
+}
+
+"""
+Enums
+"""
+enum CapsuleStatus {
+  ACTIVE
+  REVOKED
+  EXPIRED
+  SUSPENDED
+}
+
+enum AuditResult {
+  SUCCESS
+  FAILURE
+  DENIED
+  ERROR
+}
+
+enum ComponentHealth {
+  HEALTHY
+  DEGRADED
+  UNHEALTHY
+  UNKNOWN
+}
+
+enum HealthStatus {
+  PASS
+  FAIL
+  WARN
+}
+
+enum ValidationSeverity {
+  ERROR
+  WARNING
+  INFO
+}
+
+enum CapsuleEventType {
+  CREATED
+  ACCESSED
+  REVOKED
+  UPDATED
+  EXPIRED
+}
+
+enum AlertType {
+  SECURITY
+  PERFORMANCE
+  CAPACITY
+  COMPLIANCE
+  SYSTEM
+}
+
+enum AlertSeverity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+  INFO
+}
+
+enum SearchType {
+  CAPSULE
+  POLICY
+  AUDIT_LOG
+}
+
+"""
+Custom scalars
+"""
+scalar DateTime
+scalar JSON

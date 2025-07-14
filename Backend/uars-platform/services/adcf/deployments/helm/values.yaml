@@ -1,0 +1,412 @@
+# Default values for ADCF deployment
+# This is a YAML-formatted file.
+
+# Global configuration
+global:
+  # Image registry settings
+  imageRegistry: "registry.uars.platform"
+  imagePullSecrets:
+    - name: uars-registry-secret
+  
+  # Security context
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 10001
+    fsGroup: 10001
+    seccompProfile:
+      type: RuntimeDefault
+  
+  # Network policies
+  networkPolicy:
+    enabled: true
+    allowedNamespaces:
+      - uars-core
+      - uars-monitoring
+      - uars-logging
+
+# Application configuration
+app:
+  name: adcf
+  version: "1.0.0"
+  environment: production
+  logLevel: info
+  
+# Image configuration
+image:
+  repository: uars/adcf
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+  digest: ""
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "tcp"
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: adcf.uars.platform
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: adcf-tls
+      hosts:
+        - adcf.uars.platform
+
+# Resource configuration
+resources:
+  limits:
+    cpu: 2000m
+    memory: 4Gi
+    ephemeral-storage: 10Gi
+  requests:
+    cpu: 1000m
+    memory: 2Gi
+    ephemeral-storage: 5Gi
+
+# Horizontal Pod Autoscaler
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Pod Disruption Budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+# Replica configuration
+replicaCount: 3
+
+# Pod configuration
+pod:
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+    prometheus.io/path: "/metrics"
+  labels:
+    app.kubernetes.io/component: adcf
+    app.kubernetes.io/part-of: uars-platform
+  
+  # Security context for pods
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 10001
+
+# Environment variables
+env:
+  # Database configuration
+  - name: DB_HOST
+    valueFrom:
+      secretKeyRef:
+        name: adcf-database
+        key: host
+  - name: DB_PORT
+    value: "5432"
+  - name: DB_NAME
+    value: "adcf"
+  - name: DB_USER
+    valueFrom:
+      secretKeyRef:
+        name: adcf-database
+        key: username
+  - name: DB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: adcf-database
+        key: password
+  - name: DB_SSLMODE
+    value: "require"
+  
+  # Encryption configuration
+  - name: ENCRYPTION_KEY_PRIMARY
+    valueFrom:
+      secretKeyRef:
+        name: adcf-crypto
+        key: primary-key
+  - name: ENCRYPTION_KEY_SECONDARY
+    valueFrom:
+      secretKeyRef:
+        name: adcf-crypto
+        key: secondary-key
+  - name: SIGNING_KEY_PRIVATE
+    valueFrom:
+      secretKeyRef:
+        name: adcf-crypto
+        key: signing-private-key
+  - name: SIGNING_KEY_PUBLIC
+    valueFrom:
+      secretKeyRef:
+        name: adcf-crypto
+        key: signing-public-key
+  
+  # JWT configuration
+  - name: JWT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: adcf-jwt
+        key: secret
+  - name: JWT_ISSUER
+    value: "uars-adcf"
+  - name: JWT_AUDIENCE
+    value: "uars-platform"
+  
+  # Policy engine configuration
+  - name: POLICY_ENGINE_WASM_PATH
+    value: "/app/wasm/policy-engine.wasm"
+  - name: POLICY_CACHE_TTL
+    value: "3600"
+  
+  # Telemetry configuration
+  - name: METRICS_ENABLED
+    value: "true"
+  - name: TRACING_ENABLED
+    value: "true"
+  - name: JAEGER_ENDPOINT
+    value: "http://jaeger-collector.uars-monitoring:14268/api/traces"
+
+# Volume mounts
+volumeMounts:
+  - name: tmp
+    mountPath: /tmp
+  - name: cache
+    mountPath: /app/cache
+  - name: wasm
+    mountPath: /app/wasm
+    readOnly: true
+
+# Volumes
+volumes:
+  - name: tmp
+    emptyDir:
+      sizeLimit: 1Gi
+  - name: cache
+    emptyDir:
+      sizeLimit: 2Gi
+  - name: wasm
+    configMap:
+      name: adcf-wasm-policies
+
+# Health checks
+livenessProbe:
+  httpGet:
+    path: /health/live
+    port: 8080
+    scheme: HTTP
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+readinessProbe:
+  httpGet:
+    path: /health/ready
+    port: 8080
+    scheme: HTTP
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+  successThreshold: 1
+
+startupProbe:
+  httpGet:
+    path: /health/startup
+    port: 8080
+    scheme: HTTP
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 30
+  successThreshold: 1
+
+# Database configuration
+database:
+  # External PostgreSQL configuration
+  external:
+    enabled: true
+    host: "postgres.uars-data.svc.cluster.local"
+    port: 5432
+    database: "adcf"
+    
+  # Connection pool settings
+  pool:
+    maxConnections: 50
+    minConnections: 5
+    maxLifetime: "1h"
+    maxIdleTime: "30m"
+    healthCheckPeriod: "1m"
+
+# Monitoring configuration
+monitoring:
+  enabled: true
+  
+  # ServiceMonitor for Prometheus
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+    labels:
+      app: adcf
+      monitoring: prometheus
+  
+  # Grafana dashboard
+  grafanaDashboard:
+    enabled: true
+    label: grafana_dashboard
+    value: "1"
+
+# Security configuration
+security:
+  # Pod Security Standards
+  podSecurityStandards:
+    enforce: restricted
+    audit: restricted
+    warn: restricted
+  
+  # Network policies
+  networkPolicy:
+    enabled: true
+    policyTypes:
+      - Ingress
+      - Egress
+    
+    # Ingress rules
+    ingress:
+      - from:
+          - namespaceSelector:
+              matchLabels:
+                name: uars-gateway
+        ports:
+          - protocol: TCP
+            port: 8080
+      - from:
+          - namespaceSelector:
+              matchLabels:
+                name: uars-monitoring
+        ports:
+          - protocol: TCP
+            port: 8080
+    
+    # Egress rules
+    egress:
+      - to:
+          - namespaceSelector:
+              matchLabels:
+                name: uars-data
+        ports:
+          - protocol: TCP
+            port: 5432
+      - to: {}
+        ports:
+          - protocol: TCP
+            port: 53
+          - protocol: UDP
+            port: 53
+          - protocol: TCP
+            port: 443
+
+# Secrets management
+secrets:
+  # Database credentials
+  database:
+    create: false
+    name: adcf-database
+  
+  # Cryptographic keys
+  crypto:
+    create: false
+    name: adcf-crypto
+  
+  # JWT secrets
+  jwt:
+    create: false
+    name: adcf-jwt
+
+# ConfigMaps
+configMaps:
+  # WASM policy modules
+  wasmPolicies:
+    create: true
+    name: adcf-wasm-policies
+
+# Node selection
+nodeSelector:
+  kubernetes.io/arch: amd64
+  node.uars.platform/tier: compute
+
+# Tolerations
+tolerations:
+  - key: "node.uars.platform/dedicated"
+    operator: "Equal"
+    value: "compute"
+    effect: "NoSchedule"
+
+# Affinity rules
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - adcf
+          topologyKey: kubernetes.io/hostname
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node.uars.platform/tier
+              operator: In
+              values:
+                - compute
+
+# Backup configuration
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention: "30d"
+  storage:
+    class: "fast-ssd"
+    size: "100Gi"
+
+# Migration jobs
+migration:
+  enabled: true
+  image:
+    repository: uars/adcf-migrate
+    tag: "1.0.0"
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi

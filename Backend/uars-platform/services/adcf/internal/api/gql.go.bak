@@ -1,0 +1,603 @@
+package api
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"time"
+
+	"github.com/gorilla/mux"
+	"github.com/rs/zerolog/log"
+)
+
+// GraphQLRequest represents a GraphQL request
+type GraphQLRequest struct {
+	Query         string                 `json:"query"`
+	OperationName string                 `json:"operationName"`
+	Variables     map[string]interface{} `json:"variables"`
+}
+
+// GraphQLResponse represents a GraphQL response
+type GraphQLResponse struct {
+	Data   interface{}    `json:"data,omitempty"`
+	Errors []GraphQLError `json:"errors,omitempty"`
+}
+
+// GraphQLError represents a GraphQL error
+type GraphQLError struct {
+	Message    string                 `json:"message"`
+	Locations  []GraphQLLocation      `json:"locations,omitempty"`
+	Path       []interface{}          `json:"path,omitempty"`
+	Extensions map[string]interface{} `json:"extensions,omitempty"`
+}
+
+// GraphQLLocation represents an error location
+type GraphQLLocation struct {
+	Line   int `json:"line"`
+	Column int `json:"column"`
+}
+
+// GraphQLHandler handles GraphQL requests
+func GraphQLHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req GraphQLRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeErrorResponse(w, http.StatusBadRequest, "Invalid JSON", err)
+		return
+	}
+
+	// Execute the GraphQL query
+	result := s.executeGraphQLQuery(r.Context(), req)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
+}
+
+// executeGraphQLQuery executes a GraphQL query
+func executeGraphQLQuery(ctx context.Context, req GraphQLRequest) GraphQLResponse {
+	// Parse the query to determine the operation
+	operation, err := s.parseGraphQLOperation(req.Query)
+	if err != nil {
+		return GraphQLResponse{
+			Errors: []GraphQLError{
+				{
+					Message: fmt.Sprintf("Query parse error: %v", err),
+					Extensions: map[string]interface{}{
+						"code": "GRAPHQL_PARSE_FAILED",
+					},
+				},
+			},
+		}
+	}
+
+	// Execute based on operation type
+	switch operation.Type {
+	case "query":
+		return s.executeQuery(ctx, operation, req.Variables)
+	case "mutation":
+		return s.executeMutation(ctx, operation, req.Variables)
+	default:
+		return GraphQLResponse{
+			Errors: []GraphQLError{
+				{
+					Message: "Unsupported operation type",
+					Extensions: map[string]interface{}{
+						"code": "UNSUPPORTED_OPERATION",
+					},
+				},
+			},
+		}
+	}
+}
+
+// GraphQLOperation represents a parsed GraphQL operation
+type GraphQLOperation struct {
+	Type   string
+	Name   string
+	Fields []string
+}
+
+// parseGraphQLOperation parses a GraphQL query
+func (s *Server) parseGraphQLOperation(query string) (*GraphQLOperation, error) {
+	// Simple parser for demo - in production use a proper GraphQL parser
+	op := &GraphQLOperation{}
+
+	// Detect operation type
+	if contains(query, "mutation") {
+		op.Type = "mutation"
+	} else if contains(query, "subscription") {
+		op.Type = "subscription"
+	} else {
+		op.Type = "query"
+	}
+
+	// Extract operation name and fields (simplified)
+	if contains(query, "capsule(") {
+		op.Fields = append(op.Fields, "capsule")
+	}
+	if contains(query, "capsules(") {
+		op.Fields = append(op.Fields, "capsules")
+	}
+	if contains(query, "policy(") {
+		op.Fields = append(op.Fields, "policy")
+	}
+	if contains(query, "policies(") {
+		op.Fields = append(op.Fields, "policies")
+	}
+	if contains(query, "auditLogs(") {
+		op.Fields = append(op.Fields, "auditLogs")
+	}
+	if contains(query, "systemStatus") {
+		op.Fields = append(op.Fields, "systemStatus")
+	}
+	if contains(query, "createCapsule") {
+		op.Fields = append(op.Fields, "createCapsule")
+	}
+	if contains(query, "accessCapsule") {
+		op.Fields = append(op.Fields, "accessCapsule")
+	}
+	if contains(query, "createPolicy") {
+		op.Fields = append(op.Fields, "createPolicy")
+	}
+
+	return op, nil
+}
+
+// executeQuery executes a GraphQL query operation
+func (s *Server) executeQuery(ctx context.Context, op *GraphQLOperation, variables map[string]interface{}) GraphQLResponse {
+	data := make(map[string]interface{})
+
+	for _, field := range op.Fields {
+		switch field {
+		case "capsule":
+			id, ok := variables["id"].(string)
+			if !ok {
+				return s.graphQLError("Missing required variable: id")
+			}
+
+			capsule, err := s.getCapsuleByID(ctx, id)
+			if err != nil {
+				return s.graphQLError(fmt.Sprintf("Failed to get capsule: %v", err))
+			}
+			data["capsule"] = s.formatCapsuleForGraphQL(capsule)
+
+		case "capsules":
+			limit := 50
+			offset := 0
+
+			if l, ok := variables["limit"].(float64); ok {
+				limit = int(l)
+			}
+			if o, ok := variables["offset"].(float64); ok {
+				offset = int(o)
+			}
+
+			capsules, total, err := s.listCapsules(ctx, limit, offset)
+			if err != nil {
+				return s.graphQLError(fmt.Sprintf("Failed to list capsules: %v", err))
+			}
+
+			connection := map[string]interface{}{
+				"edges": s.formatCapsulesForGraphQL(capsules),
+				"pageInfo": map[string]interface{}{
+					"hasNextPage":     total > offset+len(capsules),
+					"hasPreviousPage": offset > 0,
+				},
+				"totalCount": total,
+			}
+			data["capsules"] = connection
+
+		case "policy":
+			id, ok := variables["id"].(string)
+			if !ok {
+				return s.graphQLError("Missing required variable: id")
+			}
+
+			policy, err := s.getPolicyByID(ctx, id)
+			if err != nil {
+				return s.graphQLError(fmt.Sprintf("Failed to get policy: %v", err))
+			}
+			data["policy"] = s.formatPolicyForGraphQL(policy)
+
+		case "policies":
+			limit := 50
+			offset := 0
+
+			if l, ok := variables["limit"].(float64); ok {
+				limit = int(l)
+			}
+			if o, ok := variables["offset"].(float64); ok {
+				offset = int(o)
+			}
+
+			policies, total, err := s.listPolicies(ctx, limit, offset)
+			if err != nil {
+				return s.graphQLError(fmt.Sprintf("Failed to list policies: %v", err))
+			}
+
+			connection := map[string]interface{}{
+				"edges": s.formatPoliciesForGraphQL(policies),
+				"pageInfo": map[string]interface{}{
+					"hasNextPage":     total > offset+len(policies),
+					"hasPreviousPage": offset > 0,
+				},
+				"totalCount": total,
+			}
+			data["policies"] = connection
+
+		case "auditLogs":
+			limit := 100
+			offset := 0
+
+			if l, ok := variables["limit"].(float64); ok {
+				limit = int(l)
+			}
+			if o, ok := variables["offset"].(float64); ok {
+				offset = int(o)
+			}
+
+			logs, total, err := s.getAuditLogs(ctx, limit, offset)
+			if err != nil {
+				return s.graphQLError(fmt.Sprintf("Failed to get audit logs: %v", err))
+			}
+
+			connection := map[string]interface{}{
+				"edges": s.formatAuditLogsForGraphQL(logs),
+				"pageInfo": map[string]interface{}{
+					"hasNextPage":     total > offset+len(logs),
+					"hasPreviousPage": offset > 0,
+				},
+				"totalCount": total,
+			}
+			data["auditLogs"] = connection
+
+		case "systemStatus":
+			status := s.getSystemStatus(ctx)
+			data["systemStatus"] = status
+		}
+	}
+
+	return GraphQLResponse{Data: data}
+}
+
+// executeMutation executes a GraphQL mutation operation
+func (s *Server) executeMutation(ctx context.Context, op *GraphQLOperation, variables map[string]interface{}) GraphQLResponse {
+	data := make(map[string]interface{})
+
+	for _, field := range op.Fields {
+		switch field {
+		case "createCapsule":
+			input, ok := variables["input"].(map[string]interface{})
+			if !ok {
+				return s.graphQLError("Missing required input for createCapsule")
+			}
+
+			capsule, err := s.createCapsuleFromGraphQL(ctx, input)
+			if err != nil {
+				return s.graphQLError(fmt.Sprintf("Failed to create capsule: %v", err))
+			}
+
+			data["createCapsule"] = map[string]interface{}{
+				"capsule": s.formatCapsuleForGraphQL(capsule),
+				"errors":  []interface{}{},
+			}
+
+		case "accessCapsule":
+			input, ok := variables["input"].(map[string]interface{})
+			if !ok {
+				return s.graphQLError("Missing required input for accessCapsule")
+			}
+
+			result, err := s.accessCapsuleFromGraphQL(ctx, input)
+			if err != nil {
+				return s.graphQLError(fmt.Sprintf("Failed to access capsule: %v", err))
+			}
+
+			data["accessCapsule"] = result
+
+		case "createPolicy":
+			input, ok := variables["input"].(map[string]interface{})
+			if !ok {
+				return s.graphQLError("Missing required input for createPolicy")
+			}
+
+			policy, err := s.createPolicyFromGraphQL(ctx, input)
+			if err != nil {
+				return s.graphQLError(fmt.Sprintf("Failed to create policy: %v", err))
+			}
+
+			data["createPolicy"] = map[string]interface{}{
+				"policy": s.formatPolicyForGraphQL(policy),
+				"errors": []interface{}{},
+			}
+		}
+	}
+
+	return GraphQLResponse{Data: data}
+}
+
+// Helper functions for GraphQL data formatting
+
+func (s *Server) formatCapsuleForGraphQL(capsule interface{}) map[string]interface{} {
+	// Convert capsule data to GraphQL format
+	return map[string]interface{}{
+		"id":          "capsule_id",
+		"dataHash":    "hash_value",
+		"policyId":    "policy_id",
+		"createdAt":   time.Now().Format(time.RFC3339),
+		"updatedAt":   time.Now().Format(time.RFC3339),
+		"createdBy":   "user_id",
+		"accessCount": 0,
+		"status":      "ACTIVE",
+		"metadata":    map[string]interface{}{},
+		"permissions": map[string]interface{}{
+			"read":   true,
+			"write":  false,
+			"share":  false,
+			"delete": false,
+			"admin":  false,
+		},
+	}
+}
+
+func (s *Server) formatCapsulesForGraphQL(capsules []interface{}) []map[string]interface{} {
+	edges := make([]map[string]interface{}, len(capsules))
+	for i, capsule := range capsules {
+		edges[i] = map[string]interface{}{
+			"node":   s.formatCapsuleForGraphQL(capsule),
+			"cursor": fmt.Sprintf("cursor_%d", i),
+		}
+	}
+	return edges
+}
+
+func (s *Server) formatPolicyForGraphQL(policy interface{}) map[string]interface{} {
+	return map[string]interface{}{
+		"id":               "policy_id",
+		"name":             "Policy Name",
+		"description":      "Policy description",
+		"policyDocument":   map[string]interface{}{},
+		"schemaVersion":    "1.0",
+		"createdAt":        time.Now().Format(time.RFC3339),
+		"updatedAt":        time.Now().Format(time.RFC3339),
+		"createdBy":        "user_id",
+		"active":           true,
+		"validationErrors": []interface{}{},
+	}
+}
+
+func (s *Server) formatPoliciesForGraphQL(policies []interface{}) []map[string]interface{} {
+	edges := make([]map[string]interface{}, len(policies))
+	for i, policy := range policies {
+		edges[i] = map[string]interface{}{
+			"node":   s.formatPolicyForGraphQL(policy),
+			"cursor": fmt.Sprintf("cursor_%d", i),
+		}
+	}
+	return edges
+}
+
+func (s *Server) formatAuditLogsForGraphQL(logs []interface{}) []map[string]interface{} {
+	edges := make([]map[string]interface{}, len(logs))
+	for i, logEntry := range logs {
+		edges[i] = map[string]interface{}{
+			"node": map[string]interface{}{
+				"id":        fmt.Sprintf("log_%d", i),
+				"eventType": "CAPSULE_ACCESS",
+				"userId":    "user_id",
+				"timestamp": time.Now().Format(time.RFC3339),
+				"result":    "SUCCESS",
+				"eventData": map[string]interface{}{},
+			},
+			"cursor": fmt.Sprintf("cursor_%d", i),
+		}
+	}
+	return edges
+}
+
+func (s *Server) graphQLError(message string) GraphQLResponse {
+	return GraphQLResponse{
+		Errors: []GraphQLError{
+			{
+				Message: message,
+				Extensions: map[string]interface{}{
+					"code": "INTERNAL_ERROR",
+				},
+			},
+		},
+	}
+}
+
+// Placeholder functions for GraphQL operations
+func (s *Server) getCapsuleByID(ctx context.Context, id string) (interface{}, error) {
+	log.Info().Str("id", id).Msg("Getting capsule by ID")
+	return map[string]interface{}{"id": id}, nil
+}
+
+func (s *Server) listCapsules(ctx context.Context, limit, offset int) ([]interface{}, int, error) {
+	log.Info().Int("limit", limit).Int("offset", offset).Msg("Listing capsules")
+	return []interface{}{}, 0, nil
+}
+
+func (s *Server) getPolicyByID(ctx context.Context, id string) (interface{}, error) {
+	log.Info().Str("id", id).Msg("Getting policy by ID")
+	return map[string]interface{}{"id": id}, nil
+}
+
+func (s *Server) listPolicies(ctx context.Context, limit, offset int) ([]interface{}, int, error) {
+	log.Info().Int("limit", limit).Int("offset", offset).Msg("Listing policies")
+	return []interface{}{}, 0, nil
+}
+
+func (s *Server) getAuditLogs(ctx context.Context, limit, offset int) ([]interface{}, int, error) {
+	log.Info().Int("limit", limit).Int("offset", offset).Msg("Getting audit logs")
+	return []interface{}{}, 0, nil
+}
+
+func (s *Server) getSystemStatus(ctx context.Context) map[string]interface{} {
+	return map[string]interface{}{
+		"uptime":      "24h",
+		"version":     "1.0.0",
+		"environment": "production",
+		"componentsStatus": []map[string]interface{}{
+			{
+				"name":      "database",
+				"status":    "HEALTHY",
+				"lastCheck": time.Now().Format(time.RFC3339),
+			},
+		},
+		"metrics": map[string]interface{}{
+			"totalRequests":     1000,
+			"activeCapsules":    500,
+			"totalPolicies":     50,
+			"encryptionOps":     2000,
+			"policyEvaluations": 1500,
+			"auditEvents":       800,
+			"errorCount":        5,
+			"memoryUsageMB":     256.5,
+			"goroutines":        25,
+		},
+		"healthChecks": []map[string]interface{}{
+			{
+				"name":     "database",
+				"status":   "PASS",
+				"duration": "2ms",
+			},
+		},
+	}
+}
+
+func (s *Server) createCapsuleFromGraphQL(ctx context.Context, input map[string]interface{}) (interface{}, error) {
+	log.Info().Interface("input", input).Msg("Creating capsule from GraphQL")
+	return map[string]interface{}{"id": "new_capsule_id"}, nil
+}
+
+func (s *Server) accessCapsuleFromGraphQL(ctx context.Context, input map[string]interface{}) (map[string]interface{}, error) {
+	log.Info().Interface("input", input).Msg("Accessing capsule from GraphQL")
+	return map[string]interface{}{
+		"data":        "decrypted_data",
+		"accessToken": "access_token",
+		"errors":      []interface{}{},
+	}, nil
+}
+
+func (s *Server) createPolicyFromGraphQL(ctx context.Context, input map[string]interface{}) (interface{}, error) {
+	log.Info().Interface("input", input).Msg("Creating policy from GraphQL")
+	return map[string]interface{}{"id": "new_policy_id"}, nil
+}
+
+// GraphQL Playground handler for development
+func (s *Server) GraphQLPlaygroundHandler(w http.ResponseWriter, r *http.Request) {
+	playground := `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset=utf-8/>
+  <meta name="viewport" content="user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui">
+  <title>GraphQL Playground</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/graphql-playground-react/build/static/css/index.css" />
+  <link rel="shortcut icon" href="//cdn.jsdelivr.net/npm/graphql-playground-react/build/favicon.png" />
+  <script src="//cdn.jsdelivr.net/npm/graphql-playground-react/build/static/js/middleware.js"></script>
+</head>
+<body>
+  <div id="root">
+    <style>
+      body {
+        background-color: rgb(23, 42, 58);
+        font-family: Open Sans, sans-serif;
+        height: 90vh;
+      }
+      #root {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .loading {
+        font-size: 32px;
+        font-weight: 200;
+        color: rgba(255, 255, 255, .6);
+        margin-left: 20px;
+      }
+      img {
+        width: 78px;
+        height: 78px;
+      }
+      .title {
+        font-weight: 400;
+      }
+    </style>
+    <img src='//cdn.jsdelivr.net/npm/graphql-playground-react/build/logo.png' alt=''>
+    <div class="loading"> Loading
+      <span class="title">GraphQL Playground</span>
+    </div>
+  </div>
+  <script>window.addEventListener('load', function (event) {
+      GraphQLPlayground.init(document.getElementById('root'), {
+        endpoint: '/graphql'
+      })
+    })</script>
+</body>
+</html>`
+
+	w.Header().Set("Content-Type", "text/html")
+	w.Write([]byte(playground))
+}
+
+// contains checks if a string contains a substring
+func contains(s, substr string) bool {
+	return len(s) >= len(substr) && s[:len(substr)] == substr ||
+		(len(s) > len(substr) && s[len(s)-len(substr):] == substr) ||
+		(len(s) > len(substr) && contains(s[1:], substr))
+}
+
+// WebSocket handler for GraphQL subscriptions
+func (s *Server) GraphQLWebSocketHandler(w http.ResponseWriter, r *http.Request) {
+	// Upgrade connection to WebSocket
+	conn, err := s.upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to upgrade WebSocket connection")
+		return
+	}
+	defer conn.Close()
+
+	log.Info().Msg("GraphQL WebSocket connection established")
+
+	// Handle WebSocket messages for subscriptions
+	for {
+		var msg map[string]interface{}
+		err := conn.ReadJSON(&msg)
+		if err != nil {
+			log.Error().Err(err).Msg("Error reading WebSocket message")
+			break
+		}
+
+		// Process subscription message
+		s.handleGraphQLSubscription(conn, msg)
+	}
+}
+
+// handleGraphQLSubscription processes GraphQL subscription messages
+func (s *Server) handleGraphQLSubscription(conn interface{}, msg map[string]interface{}) {
+	// Handle subscription logic here
+	log.Info().Interface("message", msg).Msg("Processing GraphQL subscription")
+}
+
+// setupGraphQLRoutes sets up GraphQL-related routes
+func (s *Server) setupGraphQLRoutes(router *mux.Router) {
+	// GraphQL endpoint
+	router.HandleFunc("/graphql", s.GraphQLHandler).Methods("POST", "OPTIONS")
+
+	// GraphQL Playground (development only)
+	if s.config.Environment == "development" {
+		router.HandleFunc("/graphql", s.GraphQLPlaygroundHandler).Methods("GET")
+	}
+
+	// WebSocket endpoint for subscriptions
+	router.HandleFunc("/graphql/ws", s.GraphQLWebSocketHandler)
+}

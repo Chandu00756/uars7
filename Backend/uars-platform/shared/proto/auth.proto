@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package uars.auth.v1;
+
+option go_package = "github.com/uars7/platform/shared/proto/auth/v1";
+
+import "google/protobuf/timestamp.proto";
+import "shared/proto/common.proto";
+
+// Authentication Service definitions
+
+service AuthService {
+  rpc Authenticate(AuthRequest) returns (AuthResponse);
+  rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse);
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
+  rpc GetUserProfile(GetUserProfileRequest) returns (GetUserProfileResponse);
+}
+
+message AuthRequest {
+  string username = 1;
+  string password = 2;
+  string mfa_token = 3;
+  string client_id = 4;
+}
+
+message AuthResponse {
+  bool success = 1;
+  string access_token = 2;
+  string refresh_token = 3;
+  google.protobuf.Timestamp expires_at = 4;
+  uars.v1.User user = 5;
+  repeated string errors = 6;
+}
+
+message ValidateTokenRequest {
+  string token = 1;
+}
+
+message ValidateTokenResponse {
+  bool valid = 1;
+  uars.v1.SecurityContext context = 2;
+  string error = 3;
+}
+
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message RefreshTokenResponse {
+  bool success = 1;
+  string access_token = 2;
+  google.protobuf.Timestamp expires_at = 3;
+  string error = 4;
+}
+
+message LogoutRequest {
+  string token = 1;
+}
+
+message LogoutResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetUserProfileRequest {
+  string user_id = 1;
+}
+
+message GetUserProfileResponse {
+  uars.v1.User user = 1;
+  string error = 2;
+}

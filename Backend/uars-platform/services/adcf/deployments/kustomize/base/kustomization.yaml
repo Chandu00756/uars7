@@ -1,0 +1,134 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: adcf-base
+  annotations:
+    uars.platform/component: "adcf"
+    uars.platform/kustomize-type: "base"
+
+# Namespace for all resources
+namespace: uars-adcf
+
+# Common labels applied to all resources
+commonLabels:
+  app.kubernetes.io/name: adcf
+  app.kubernetes.io/component: adcf
+  app.kubernetes.io/part-of: uars-platform
+  uars.platform/tier: core
+
+# Common annotations applied to all resources
+commonAnnotations:
+  uars.platform/managed-by: kustomize
+  uars.platform/version: "1.0.0"
+
+# Resources to include
+resources:
+  - namespace.yaml
+  - deployment.yaml
+  - service.yaml
+  - configmap.yaml
+  - secret.yaml
+  - serviceaccount.yaml
+  - rbac.yaml
+  - networkpolicy.yaml
+  - poddisruptionbudget.yaml
+  - horizontalpodautoscaler.yaml
+
+# ConfigMap generators
+configMapGenerator:
+  - name: adcf-config
+    files:
+      - configs/app.yaml
+      - configs/logging.yaml
+    options:
+      disableNameSuffixHash: true
+  
+  - name: adcf-fluent-bit
+    files:
+      - configs/fluent-bit.conf
+      - configs/parsers.conf
+    options:
+      disableNameSuffixHash: true
+
+# Secret generators
+secretGenerator:
+  - name: adcf-database
+    literals:
+      - host=postgres.uars-data.svc.cluster.local
+      - port=5432
+      - database=adcf
+      - username=adcf
+      - password=CHANGEME
+    type: Opaque
+    options:
+      disableNameSuffixHash: true
+  
+  - name: adcf-crypto
+    literals:
+      - primary-key=CHANGEME
+      - secondary-key=CHANGEME
+      - signing-private-key=CHANGEME
+      - signing-public-key=CHANGEME
+    type: Opaque
+    options:
+      disableNameSuffixHash: true
+  
+  - name: adcf-jwt
+    literals:
+      - secret=CHANGEME
+    type: Opaque
+    options:
+      disableNameSuffixHash: true
+
+# Images to use
+images:
+  - name: adcf
+    newName: registry.uars.platform/uars/adcf
+    newTag: "1.0.0"
+  - name: adcf-migrate
+    newName: registry.uars.platform/uars/adcf-migrate
+    newTag: "1.0.0"
+
+# Patches
+patchesStrategicMerge:
+  - patches/deployment-security.yaml
+  - patches/service-annotations.yaml
+
+# JSON patches
+patchesJson6902:
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: adcf
+    path: patches/deployment-resources.yaml
+
+# Replica count
+replicas:
+  - name: adcf
+    count: 3
+
+# Name prefix for all resources
+namePrefix: ""
+
+# Name suffix for all resources
+nameSuffix: ""
+
+# Variables for replacement
+vars:
+  - name: NAMESPACE
+    objref:
+      apiVersion: v1
+      kind: Namespace
+      name: uars-adcf
+  - name: SERVICE_NAME
+    objref:
+      apiVersion: v1
+      kind: Service
+      name: adcf
+
+# Build metadata
+buildMetadata:
+  - originAnnotations
+  - transformerAnnotations

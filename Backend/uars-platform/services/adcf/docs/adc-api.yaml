@@ -1,0 +1,514 @@
+openapi: 3.0.3
+info:
+  title: ADCF (Autonomous Data Capsule Fabric) API
+  description: |
+    Military-grade data encapsulation and access control system providing
+    government-level security for sensitive data operations.
+  version: 1.0.0
+  contact:
+    name: UARS-7 Platform Team
+    email: adcf-support@uars7.gov
+  license:
+    name: Classified
+    url: https://classified.gov/license
+
+servers:
+  - url: https://adcf.uars7.gov/api/v1
+    description: Production server
+  - url: https://adcf-staging.uars7.gov/api/v1
+    description: Staging server
+
+security:
+  - BearerAuth: []
+  - IntentToken: []
+
+paths:
+  /healthz:
+    get:
+      summary: Health check endpoint
+      description: Returns the health status of the ADCF service
+      security: []
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /capsules:
+    post:
+      summary: Create a new data capsule
+      description: Encrypts and stores data with specified access policies
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCapsuleRequest'
+      responses:
+        '201':
+          description: Capsule created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapsuleResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    get:
+      summary: List capsules
+      description: Retrieve a list of capsules accessible to the authenticated user
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, revoked, expired]
+      responses:
+        '200':
+          description: List of capsules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Capsule'
+
+  /capsules/{id}:
+    get:
+      summary: Get capsule details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Capsule details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapsuleResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /capsules/{id}/access:
+    post:
+      summary: Access capsule data
+      description: Decrypt and retrieve the data from a capsule
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessRequest'
+      responses:
+        '200':
+          description: Capsule data retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /capsules/{id}/revoke:
+    post:
+      summary: Revoke capsule access
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Capsule access revoked
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /policies:
+    post:
+      summary: Create access policy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePolicyRequest'
+      responses:
+        '201':
+          description: Policy created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyResponse'
+
+    get:
+      summary: List policies
+      responses:
+        '200':
+          description: List of policies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Policy'
+
+  /policies/{id}:
+    get:
+      summary: Get policy details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Policy details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyResponse'
+
+  /audit/logs:
+    get:
+      summary: Get audit logs
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+        - name: event_type
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Audit logs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AuditLog'
+
+  /graphql:
+    post:
+      summary: GraphQL endpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GraphQLRequest'
+      responses:
+        '200':
+          description: GraphQL response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphQLResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    IntentToken:
+      type: apiKey
+      in: header
+      name: X-Intent-Token
+
+  schemas:
+    CreateCapsuleRequest:
+      type: object
+      required:
+        - data
+        - policy_id
+      properties:
+        data:
+          type: string
+          format: base64
+          description: Base64 encoded data to encapsulate
+        policy_id:
+          type: string
+          format: uuid
+          description: ID of the access policy to apply
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Additional metadata for the capsule
+
+    CapsuleResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Capsule'
+
+    Capsule:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        data_hash:
+          type: string
+          description: SHA-256 hash of the encrypted data
+        policy_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        access_count:
+          type: integer
+        status:
+          type: string
+          enum: [active, revoked, expired]
+        metadata:
+          type: object
+          additionalProperties: true
+
+    AccessRequest:
+      type: object
+      required:
+        - purpose
+      properties:
+        purpose:
+          type: string
+          description: Purpose of accessing the data
+        context:
+          type: object
+          additionalProperties: true
+          description: Additional context for policy evaluation
+
+    AccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            data:
+              type: string
+              format: base64
+              description: Decrypted data (base64 encoded)
+            access_token:
+              type: string
+              description: Temporary access token for subsequent operations
+
+    CreatePolicyRequest:
+      type: object
+      required:
+        - name
+        - policy_document
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        policy_document:
+          type: object
+          description: JSON-based policy rules
+
+    PolicyResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Policy'
+
+    Policy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        policy_document:
+          type: object
+        schema_version:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        active:
+          type: boolean
+
+    AuditLog:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        event_type:
+          type: string
+        capsule_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+        ip_address:
+          type: string
+          format: ipv4
+        event_data:
+          type: object
+        result:
+          type: string
+          enum: [success, failure, denied]
+        timestamp:
+          type: string
+          format: date-time
+
+    GraphQLRequest:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          description: GraphQL query string
+        variables:
+          type: object
+          additionalProperties: true
+
+    GraphQLResponse:
+      type: object
+      properties:
+        data:
+          type: object
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+              path:
+                type: array
+                items:
+                  type: string
+
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Error code
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+tags:
+  - name: Health
+    description: Health and status endpoints
+  - name: Capsules
+    description: Data capsule operations
+  - name: Policies
+    description: Access policy management
+  - name: Audit
+    description: Audit and compliance
+  - name: GraphQL
+    description: GraphQL API

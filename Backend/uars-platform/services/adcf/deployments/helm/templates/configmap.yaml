@@ -1,0 +1,210 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "adcf.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "adcf.labels" . | nindent 4 }}
+  annotations:
+    uars.platform/component: "adcf"
+    uars.platform/config-type: "application"
+data:
+  # Application configuration
+  app.yaml: |
+    server:
+      host: "0.0.0.0"
+      port: 8080
+      read_timeout: 30s
+      write_timeout: 30s
+      idle_timeout: 120s
+      max_header_bytes: 1048576
+      
+    database:
+      host: {{ .Values.database.external.host | quote }}
+      port: {{ .Values.database.external.port }}
+      name: {{ .Values.database.external.database | quote }}
+      ssl_mode: "require"
+      pool:
+        max_connections: {{ .Values.database.pool.maxConnections }}
+        min_connections: {{ .Values.database.pool.minConnections }}
+        max_lifetime: {{ .Values.database.pool.maxLifetime | quote }}
+        max_idle_time: {{ .Values.database.pool.maxIdleTime | quote }}
+        health_check_period: {{ .Values.database.pool.healthCheckPeriod | quote }}
+    
+    logging:
+      level: {{ .Values.app.logLevel | quote }}
+      format: "json"
+      output: "stdout"
+      
+    metrics:
+      enabled: true
+      port: 9090
+      path: "/metrics"
+      
+    tracing:
+      enabled: true
+      service_name: "adcf"
+      environment: {{ .Values.app.environment | quote }}
+      
+    security:
+      encryption:
+        algorithm: "aes-256-gcm"
+        key_rotation_interval: "24h"
+      
+      signing:
+        algorithm: "ed25519"
+        
+      jwt:
+        issuer: {{ index .Values.env (len .Values.env | add -1) | dig "value" "uars-adcf" | quote }}
+        audience: "uars-platform"
+        expiration: "1h"
+        
+    policy:
+      engine: "wasm"
+      cache_ttl: 3600
+      max_policy_size: "10MB"
+      
+    audit:
+      enabled: true
+      retention_days: 2555  # 7 years
+      
+    backup:
+      enabled: {{ .Values.backup.enabled }}
+      schedule: {{ .Values.backup.schedule | quote }}
+      retention: {{ .Values.backup.retention | quote }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "adcf.fullname" . }}-fluent-bit
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "adcf.labels" . | nindent 4 }}
+  annotations:
+    uars.platform/component: "adcf"
+    uars.platform/config-type: "logging"
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Flush         1
+        Log_Level     info
+        Daemon        off
+        Parsers_File  parsers.conf
+        HTTP_Server   On
+        HTTP_Listen   0.0.0.0
+        HTTP_Port     2020
+
+    [INPUT]
+        Name              tail
+        Path              /var/log/containers/adcf-*.log
+        Parser            docker
+        Tag               adcf.*
+        Refresh_Interval  5
+        Mem_Buf_Limit     50MB
+        Skip_Long_Lines   On
+
+    [FILTER]
+        Name                kubernetes
+        Match               adcf.*
+        Kube_URL            https://kubernetes.default.svc:443
+        Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
+        Kube_Tag_Prefix     adcf.var.log.containers.
+        Merge_Log           On
+        Merge_Log_Key       log_processed
+        K8S-Logging.Parser  On
+        K8S-Logging.Exclude Off
+
+    [FILTER]
+        Name    record_modifier
+        Match   adcf.*
+        Record  service adcf
+        Record  environment {{ .Values.app.environment }}
+
+    [OUTPUT]
+        Name  forward
+        Match adcf.*
+        Host  fluentd.uars-logging.svc.cluster.local
+        Port  24224
+        Retry_Limit 3
+
+  parsers.conf: |
+    [PARSER]
+        Name        docker
+        Format      json
+        Time_Key    time
+        Time_Format %Y-%m-%dT%H:%M:%S.%L
+        Time_Keep   On
+
+    [PARSER]
+        Name        adcf-json
+        Format      json
+        Time_Key    timestamp
+        Time_Format %Y-%m-%dT%H:%M:%S.%L
+        Time_Keep   On
+
+---
+{{- if .Values.configMaps.wasmPolicies.create }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.configMaps.wasmPolicies.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "adcf.labels" . | nindent 4 }}
+  annotations:
+    uars.platform/component: "adcf"
+    uars.platform/config-type: "wasm-policies"
+binaryData:
+  policy-engine.wasm: |
+    # This would contain the compiled WASM binary
+    # In a real deployment, this would be populated with the actual WASM file
+    # For now, this is a placeholder that should be replaced with the actual binary
+data:
+  default-policies.json: |
+    [
+      {
+        "id": "default-access-policy",
+        "name": "Default Access Policy",
+        "version": "1.0.0",
+        "description": "Default policy for ADCF access control",
+        "target": "true",
+        "combining_algorithm": "deny-overrides",
+        "rules": [
+          {
+            "id": "authenticated-users",
+            "name": "Allow authenticated users",
+            "description": "Grant access to authenticated users with valid tokens",
+            "priority": 100,
+            "condition": "user.authenticated == true",
+            "effect": "PERMIT",
+            "obligations": ["log_access"],
+            "advice": []
+          },
+          {
+            "id": "require-mfa-classified",
+            "name": "Require MFA for classified data",
+            "description": "Multi-factor authentication required for classified resources",
+            "priority": 200,
+            "condition": "resource.classification == 'classified' && user.mfa_verified == true",
+            "effect": "PERMIT",
+            "obligations": ["log_classified_access", "notify_security"],
+            "advice": ["classification_reminder"]
+          },
+          {
+            "id": "deny-high-risk",
+            "name": "Deny high risk access",
+            "description": "Deny access when risk score is too high",
+            "priority": 300,
+            "condition": "context.risk_score > 8.0",
+            "effect": "DENY",
+            "obligations": ["alert_security", "log_denied_access"],
+            "advice": ["risk_mitigation"]
+          }
+        ],
+        "obligations": [],
+        "advice": []
+      }
+    ]
+{{- end }}

@@ -1,0 +1,214 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: uars7
+  labels:
+    name: uars7
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: uars7-config
+  namespace: uars7
+data:
+  database.host: "postgres"
+  database.port: "5432"
+  database.name: "uars7"
+  redis.host: "redis"
+  redis.port: "6379"
+  nats.url: "nats://nats:4222"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: uars7-secrets
+  namespace: uars7
+type: Opaque
+data:
+  database.username: dWFyczc=  # uars7
+  database.password: dWFyczdfcHJvZF9wYXNzd29yZA==  # uars7_prod_password
+  jwt.secret: eW91ci1zdXBlci1zZWNyZXQta2V5LWZvci1wcm9kdWN0aW9u  # your-super-secret-key-for-production
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cads
+  namespace: uars7
+  labels:
+    app: cads
+    service: authentication
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cads
+  template:
+    metadata:
+      labels:
+        app: cads
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: cads
+        image: uars7-registry/cads:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 50051
+          name: grpc
+        env:
+        - name: DATABASE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: uars7-config
+              key: database.host
+        - name: DATABASE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: uars7-config
+              key: database.port
+        - name: DATABASE_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: uars7-config
+              key: database.name
+        - name: DATABASE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: uars7-secrets
+              key: database.username
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: uars7-secrets
+              key: database.password
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: uars7-secrets
+              key: jwt.secret
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cads
+  namespace: uars7
+  labels:
+    app: cads
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  - port: 50051
+    targetPort: 50051
+    protocol: TCP
+    name: grpc
+  selector:
+    app: cads
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: m-ses
+  namespace: uars7
+  labels:
+    app: m-ses
+    service: security
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: m-ses
+  template:
+    metadata:
+      labels:
+        app: m-ses
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8081"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: m-ses
+        image: uars7-registry/m-ses:latest
+        ports:
+        - containerPort: 8081
+          name: http
+        - containerPort: 50052
+          name: grpc
+        env:
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: uars7-config
+              key: redis.host
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: uars7-config
+              key: redis.port
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8081
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: m-ses
+  namespace: uars7
+  labels:
+    app: m-ses
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8081
+    targetPort: 8081
+    protocol: TCP
+    name: http
+  - port: 50052
+    targetPort: 50052
+    protocol: TCP
+    name: grpc
+  selector:
+    app: m-ses

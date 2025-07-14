@@ -1,0 +1,58 @@
+{
+  "@context": {
+    "adcf":      "https://portalvii.com/ns/adcf#",
+    "geo":       "http://schema.org/geo",
+    "x509":      "https://w3id.org/security#X509Certificate",
+    "allow":     "adcf:allow",
+    "deny":      "adcf:deny",
+    "require":   "adcf:require",
+    "condition": "adcf:condition",
+    "resource":  "adcf:resource",
+    "action":    "adcf:action",
+    "subject":   "adcf:subject",
+    "context":   "adcf:context",
+    "temporal":  "adcf:temporal",
+    "geo:location": {
+      "@type": "geo:GeoCoordinates"
+    },
+    "security": {
+      "@type": "adcf:SecurityContext",
+      "@container": "@set"
+    },
+    "attestation": {
+      "@type": "adcf:AttestationClaim"
+    }
+  },
+  "@graph": [
+    {
+      "@id": "adcf:PolicyRule",
+      "@type": "rdfs:Class",
+      "rdfs:label": "Policy Rule",
+      "rdfs:comment": "A rule that defines access control decisions"
+    },
+    {
+      "@id": "adcf:AccessDecision",
+      "@type": "rdfs:Class",
+      "rdfs:label": "Access Decision",
+      "rdfs:comment": "The result of policy evaluation"
+    },
+    {
+      "@id": "adcf:SecurityContext",
+      "@type": "rdfs:Class",
+      "rdfs:label": "Security Context",
+      "rdfs:comment": "Security-related context information"
+    },
+    {
+      "@id": "adcf:AttestationClaim",
+      "@type": "rdfs:Class",
+      "rdfs:label": "Attestation Claim",
+      "rdfs:comment": "A verifiable claim about context"
+    },
+    {
+      "@id": "adcf:ComplianceRule",
+      "@type": "rdfs:Class",
+      "rdfs:label": "Compliance Rule",
+      "rdfs:comment": "A rule for regulatory compliance checking"
+    }
+  ]
+}

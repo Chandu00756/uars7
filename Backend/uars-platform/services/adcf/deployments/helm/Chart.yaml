@@ -1,0 +1,25 @@
+apiVersion: v2
+name: adcf
+description: Autonomous Data Capsule Fabric (ADCF) - Military-grade data protection service
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+home: https://uars.platform
+sources:
+  - https://github.com/uars-platform/adcf
+keywords:
+  - data-protection
+  - encryption
+  - military-grade
+  - zero-trust
+  - policy-engine
+maintainers:
+  - name: UARS Platform Team
+    email: platform@uars.mil
+    url: https://uars.platform
+annotations:
+  category: Security
+  description: "Enterprise-grade autonomous data capsule fabric with military-grade encryption and zero-trust architecture"
+  uars.platform/component: "adcf"
+  uars.platform/tier: "core"
+  uars.platform/classification: "restricted"
