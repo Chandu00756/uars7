@@ -1,6 +1,7 @@
 import './../components/pagecss/dashboard.css';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   Search, 
   Command, 
@@ -27,6 +28,7 @@ import {
   Server,
   Globe,
   Cpu,
+  BarChart3,
   HardDrive,
   MemoryStick,
   Plus,
@@ -242,14 +244,16 @@ const PrimarySidebar: React.FC<{
   activeSection: string;
   onSectionChange: (section: string) => void;
 }> = ({ isOpen, isCollapsed, onToggle, activeSection, onSectionChange }) => {
+  const location = useLocation();
+  
   const sevenLayers = [
-    { id: 'cads', label: 'CADS', icon: Shield, status: 'online', description: 'Cyber Attack Defense System' },
-    { id: 'm-ses', label: 'M-SES', icon: Activity, status: 'warning', description: 'Multi-Sensor Event System' },
-    { id: 'shel', label: 'SHEL', icon: Database, status: 'online', description: 'Secure Hyperledger' },
-    { id: 'ilecg', label: 'ILECG', icon: Zap, status: 'online', description: 'Intelligent Log Event Correlation' },
-    { id: 'qvdm', label: 'QVDM', icon: Brain, status: 'offline', description: 'Quantum Variant Detection Matrix' },
-    { id: 'trdn', label: 'TRDN', icon: Clock, status: 'online', description: 'Time-Reversible Data Network' },
-    { id: 'adcf', label: 'ADCF', icon: Settings, status: 'online', description: 'Autonomous Defense Control Framework' }
+    { id: 'cads', label: 'CADS', icon: Shield, status: 'online', description: 'Cyber Attack Defense System', route: '/layers/cads' },
+    { id: 'm-ses', label: 'M-SES', icon: Activity, status: 'warning', description: 'Multi-Sensor Event System', route: '/layers/mses' },
+    { id: 'shel', label: 'SHEL', icon: Database, status: 'online', description: 'Secure Hyperledger', route: '/layers/shel' },
+    { id: 'ilecg', label: 'ILECG', icon: Zap, status: 'online', description: 'Intelligent Log Event Correlation', route: '/layers/ilecg' },
+    { id: 'qvdm', label: 'QVDM', icon: Brain, status: 'offline', description: 'Quantum Variant Detection Matrix', route: '/layers/qvdm' },
+    { id: 'trdn', label: 'TRDN', icon: Clock, status: 'online', description: 'Time-Reversible Data Network', route: '/layers/trdn' },
+    { id: 'adcf', label: 'ADCF', icon: Settings, status: 'online', description: 'Autonomous Defense Control Framework', route: '/layers/adcf' }
   ];
   
   const managementItems = [
@@ -290,17 +294,27 @@ const PrimarySidebar: React.FC<{
         </button>
         
         <div className="portal-sidebar-content">
+          {/* Dashboard Link */}
+          <div className="portal-nav-section">
+            <Link
+              to="/dashboard"
+              className={`portal-nav-item ${location.pathname === '/dashboard' ? 'active' : ''} portal-holo-border`}
+              title="Dashboard Overview"
+            >
+              <BarChart3 size={18} />
+              {!isCollapsed && (
+                <span className="portal-flex-1 portal-text-left">Dashboard</span>
+              )}
+            </Link>
+          </div>
+          
           <div className="portal-nav-section">
             <h3 className="portal-nav-title">Dimensions</h3>
             {sevenLayers.map((item, index) => (
-              <button
+              <Link
                 key={item.id}
-                className={`portal-nav-item ${activeSection === item.id ? 'active' : ''} portal-holo-border`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onSectionChange(item.id);
-                }}
+                to={item.route}
+                className={`portal-nav-item ${location.pathname === item.route ? 'active' : ''} portal-holo-border`}
                 title={item.description}
               >
                 <item.icon size={18} />
@@ -310,7 +324,7 @@ const PrimarySidebar: React.FC<{
                     <div className={`portal-status-indicator ${item.status}`}></div>
                   </>
                 )}
-              </button>
+              </Link>
             ))}
           </div>
           

@@ -24,6 +24,15 @@ import CapsuleAccess    from "./pages/CapsuleAccess";
 import SecurityEvents   from "./pages/SecurityEvents";
 import AdminPanel       from "./pages/AdminPanel";
 
+// Layer Pages
+import CADSPage from "./pages/layers/CADS";
+import MSESPage from "./pages/layers/MSES";
+import SHELPage from "./pages/layers/SHEL";
+import ILECGPage from "./pages/layers/ILECG";
+import QVDMPage from "./pages/layers/QVDM";
+import TRDNPage from "./pages/layers/TRDN";
+import ADCFPage from "./pages/layers/ADCF";
+
 import PrivateRoute from "./components/PrivateRoute";
 import Footer       from "./components/Footer";
 import theme        from "./theme";
@@ -202,6 +211,65 @@ function AppShell() {
                   </PrivateRoute>
                 }
               />
+              
+              {/* Layer Routes */}
+              <Route
+                path="/layers/cads"
+                element={
+                  <PrivateRoute>
+                    <CADSPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/layers/mses"
+                element={
+                  <PrivateRoute>
+                    <MSESPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/layers/shel"
+                element={
+                  <PrivateRoute>
+                    <SHELPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/layers/ilecg"
+                element={
+                  <PrivateRoute>
+                    <ILECGPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/layers/qvdm"
+                element={
+                  <PrivateRoute>
+                    <QVDMPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/layers/trdn"
+                element={
+                  <PrivateRoute>
+                    <TRDNPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/layers/adcf"
+                element={
+                  <PrivateRoute>
+                    <ADCFPage />
+                  </PrivateRoute>
+                }
+              />
+              
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Box>

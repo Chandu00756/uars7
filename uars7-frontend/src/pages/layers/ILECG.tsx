@@ -18,6 +18,7 @@ import {
   Shield
 } from 'lucide-react';
 
+
 // Define TypeScript interfaces
 interface CorrelationEvent {
   id: string;
@@ -181,12 +182,13 @@ const ILECG: React.FC = () => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="portal-ilecg-page"
-    >
+    <div className="portal-min-h-screen portal-bg-primary">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="portal-ilecg-page portal-p-6"
+      >
       {/* Header */}
       <div className="portal-page-header portal-mb-6">
         <h1 className="portal-text-3xl portal-font-bold portal-mb-2">
@@ -452,7 +454,8 @@ const ILECG: React.FC = () => {
           ))}
         </div>
       </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 };
 

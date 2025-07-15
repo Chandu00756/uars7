@@ -1,39 +1,40 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Database,
-  Lock,
-  Shield,
   Activity,
-  TrendingUp,
-  CheckCircle,
   AlertTriangle,
+  CheckCircle,
   Clock,
-  Settings,
-  RefreshCw,
-  Play,
-  Pause,
+  Copy,
+  Cpu,
+  Database,
   Download,
-  Upload,
+  Edit,
+  ExternalLink,
   Eye,
+  FileText,
+  Filter,
+  HardDrive,
   Hash,
   Link,
-  Server,
-  Cpu,
-  HardDrive,
+  Lock,
   Network,
-  Zap,
-  Users,
-  FileText,
-  Search,
-  Filter,
+  Pause,
+  Play,
   Plus,
-  Edit,
+  RefreshCw,
+  Search,
+  Server,
+  Settings,
+  Shield,
   Trash2,
-  Copy,
-  ExternalLink,
-  X
+  TrendingUp,
+  Upload,
+  Users,
+  X,
+  Zap
 } from 'lucide-react';
+
 
 interface BlockchainMetrics {
   totalBlocks: number;
@@ -309,12 +310,18 @@ const SHEL: React.FC = () => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="portal-shel-dashboard portal-space-y-6"
-    >
+    <div style={{ 
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+      color: '#ffffff',
+      fontFamily: "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
+    }}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="portal-shel-dashboard portal-space-y-6 portal-p-6"
+      >
       {/* Header */}
       <div className="portal-flex portal-justify-between portal-items-center">
         <div>
@@ -338,6 +345,7 @@ const SHEL: React.FC = () => {
           <button
             onClick={() => setAutoRefresh(!autoRefresh)}
             className={`portal-btn portal-btn-sm ${autoRefresh ? 'portal-btn-primary' : 'portal-btn-secondary'}`}
+            aria-label={autoRefresh ? 'Pause auto-refresh' : 'Enable auto-refresh'}
           >
             {autoRefresh ? <Pause size={16} /> : <Play size={16} />}
             {autoRefresh ? 'Live' : 'Paused'}
@@ -346,6 +354,7 @@ const SHEL: React.FC = () => {
           <button
             onClick={refreshData}
             className="portal-btn portal-btn-secondary portal-btn-sm"
+            aria-label="Refresh blockchain data"
           >
             <RefreshCw size={16} />
             Refresh
@@ -354,6 +363,7 @@ const SHEL: React.FC = () => {
           <button
             onClick={exportData}
             className="portal-btn portal-btn-secondary portal-btn-sm"
+            aria-label="Export blockchain data"
           >
             <Download size={16} />
             Export
@@ -446,6 +456,7 @@ const SHEL: React.FC = () => {
                   ? 'portal-border-accent portal-text-accent'
                   : 'portal-border-transparent portal-text-secondary hover:portal-text-primary'
               }`}
+              aria-label={`Switch to ${tab.label} tab`}
             >
               <tab.icon size={16} />
               {tab.label}
@@ -584,6 +595,7 @@ const SHEL: React.FC = () => {
                       value={filterStatus}
                       onChange={(e) => setFilterStatus(e.target.value)}
                       className="portal-px-3 portal-py-2 portal-border portal-rounded portal-bg-surface"
+                      aria-label="Filter transactions by status"
                     >
                       <option value="all">All Status</option>
                       <option value="confirmed">Confirmed</option>
@@ -657,7 +669,7 @@ const SHEL: React.FC = () => {
               <div className="portal-bg-surface portal-rounded-xl portal-p-6">
                 <div className="portal-flex portal-justify-between portal-items-center portal-mb-6">
                   <h3 className="portal-text-xl portal-font-semibold">Smart Contracts</h3>
-                  <button className="portal-btn portal-btn-primary">
+                  <button className="portal-btn portal-btn-primary" aria-label="Deploy new smart contract">
                     <Plus size={16} />
                     Deploy Contract
                   </button>
@@ -722,15 +734,15 @@ const SHEL: React.FC = () => {
                       </div>
                       
                       <div className="portal-flex portal-gap-2 portal-mt-4">
-                        <button className="portal-btn portal-btn-sm portal-btn-secondary">
+                        <button className="portal-btn portal-btn-sm portal-btn-secondary" aria-label="View contract details">
                           <Eye size={14} />
                           View Details
                         </button>
-                        <button className="portal-btn portal-btn-sm portal-btn-secondary">
+                        <button className="portal-btn portal-btn-sm portal-btn-secondary" aria-label="Interact with contract">
                           <Edit size={14} />
                           Interact
                         </button>
-                        <button className="portal-btn portal-btn-sm portal-btn-secondary">
+                        <button className="portal-btn portal-btn-sm portal-btn-secondary" aria-label="Copy contract address">
                           <Copy size={14} />
                           Copy Address
                         </button>
@@ -809,11 +821,14 @@ const SHEL: React.FC = () => {
                       </div>
                       
                       <div className="portal-flex portal-gap-2 portal-mt-4">
-                        <button className="portal-btn portal-btn-sm portal-btn-secondary portal-flex-1">
+                        <button className="portal-btn portal-btn-sm portal-btn-secondary portal-flex-1" aria-label="Monitor node performance">
                           <Activity size={14} />
                           Monitor
                         </button>
-                        <button className="portal-btn portal-btn-sm portal-btn-secondary">
+                        <button 
+                          className="portal-btn portal-btn-sm portal-btn-secondary"
+                          aria-label="Node settings"
+                        >
                           <Settings size={14} />
                         </button>
                       </div>
@@ -888,11 +903,11 @@ const SHEL: React.FC = () => {
                       </div>
                       
                       <div className="portal-flex portal-gap-2">
-                        <button className="portal-btn portal-btn-sm portal-btn-primary">
+                        <button className="portal-btn portal-btn-sm portal-btn-primary" aria-label="Investigate security event">
                           <Eye size={14} />
                           Investigate
                         </button>
-                        <button className="portal-btn portal-btn-sm portal-btn-secondary">
+                        <button className="portal-btn portal-btn-sm portal-btn-secondary" aria-label="Mark event as resolved">
                           <CheckCircle size={14} />
                           Mark Resolved
                         </button>
@@ -928,6 +943,7 @@ const SHEL: React.FC = () => {
                 <button
                   onClick={() => setSelectedTransaction(null)}
                   className="portal-text-secondary hover:portal-text-primary"
+                  aria-label="Close transaction details"
                 >
                   <X size={24} />
                 </button>
@@ -984,11 +1000,11 @@ const SHEL: React.FC = () => {
                 </div>
                 
                 <div className="portal-flex portal-gap-3 portal-pt-4">
-                  <button className="portal-btn portal-btn-secondary">
+                  <button className="portal-btn portal-btn-secondary" aria-label="Copy transaction hash">
                     <Copy size={16} />
                     Copy Hash
                   </button>
-                  <button className="portal-btn portal-btn-secondary">
+                  <button className="portal-btn portal-btn-secondary" aria-label="View transaction on block explorer">
                     <ExternalLink size={16} />
                     View on Explorer
                   </button>
@@ -1021,6 +1037,7 @@ const SHEL: React.FC = () => {
                 <button
                   onClick={() => setSelectedContract(null)}
                   className="portal-text-secondary hover:portal-text-primary"
+                  aria-label="Close smart contract details"
                 >
                   <X size={24} />
                 </button>
@@ -1079,19 +1096,19 @@ const SHEL: React.FC = () => {
                 </div>
                 
                 <div className="portal-flex portal-gap-3 portal-pt-4">
-                  <button className="portal-btn portal-btn-primary">
+                  <button className="portal-btn portal-btn-primary" aria-label="View smart contract source code">
                     <Eye size={16} />
                     View Source Code
                   </button>
-                  <button className="portal-btn portal-btn-secondary">
+                  <button className="portal-btn portal-btn-secondary" aria-label="Interact with smart contract">
                     <Edit size={16} />
                     Interact
                   </button>
-                  <button className="portal-btn portal-btn-secondary">
+                  <button className="portal-btn portal-btn-secondary" aria-label="Copy contract address">
                     <Copy size={16} />
                     Copy Address
                   </button>
-                  <button className="portal-btn portal-btn-secondary">
+                  <button className="portal-btn portal-btn-secondary" aria-label="View contract on block explorer">
                     <ExternalLink size={16} />
                     View on Explorer
                   </button>
@@ -1101,7 +1118,8 @@ const SHEL: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 };
 

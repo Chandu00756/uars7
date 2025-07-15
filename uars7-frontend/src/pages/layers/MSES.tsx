@@ -205,12 +205,18 @@ const MSES: React.FC = () => {
   );
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="portal-mses-page"
-    >
+    <div style={{ 
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #0c1445 0%, #1a2332 100%)',
+      color: '#ffffff',
+      fontFamily: "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
+    }}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="portal-mses-page portal-p-6"
+      >
       {/* Header Section */}
       <div className="portal-page-header portal-mb-6">
         <div className="portal-flex portal-items-center portal-gap-3 portal-mb-4">
@@ -238,6 +244,7 @@ const MSES: React.FC = () => {
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value)}
               className="portal-px-3 portal-py-2 portal-rounded portal-border"
+              aria-label="Select time range for sensor data"
             >
               <option value="5m">Last 5 minutes</option>
               <option value="15m">Last 15 minutes</option>
@@ -253,6 +260,7 @@ const MSES: React.FC = () => {
               value={activeFilter}
               onChange={(e) => setActiveFilter(e.target.value)}
               className="portal-px-3 portal-py-2 portal-rounded portal-border"
+              aria-label="Filter sensors by category"
             >
               <option value="all">All Sensors</option>
               <option value="network">Network</option>
@@ -339,7 +347,10 @@ const MSES: React.FC = () => {
         <div className="portal-bg-surface portal-rounded-lg portal-p-6">
           <div className="portal-flex portal-items-center portal-justify-between portal-mb-6">
             <h2 className="portal-text-xl portal-font-semibold">Sensor Status</h2>
-            <button className="portal-p-2 portal-rounded portal-hover:portal-bg-secondary portal-transition-colors">
+            <button 
+              className="portal-p-2 portal-rounded portal-hover:portal-bg-secondary portal-transition-colors"
+              aria-label="Refresh sensor status"
+            >
               <RefreshCw size={16} />
             </button>
           </div>
@@ -454,6 +465,7 @@ const MSES: React.FC = () => {
                 value={activeFilter}
                 onChange={(e) => setActiveFilter(e.target.value)}
                 className="portal-px-2 portal-py-1 portal-rounded portal-border portal-text-sm"
+                aria-label="Filter events by severity level"
               >
                 <option value="all">All Events</option>
                 <option value="critical">Critical</option>
@@ -552,7 +564,8 @@ const MSES: React.FC = () => {
           </p>
         </div>
       </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 };
 

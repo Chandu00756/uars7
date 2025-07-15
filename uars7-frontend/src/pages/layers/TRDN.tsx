@@ -555,6 +555,7 @@ const TRDN: React.FC = () => {
                       value={filterStatus}
                       onChange={(e) => setFilterStatus(e.target.value)}
                       className="portal-px-3 portal-py-2 portal-border portal-rounded portal-bg-surface"
+                      aria-label="Filter snapshots by status"
                     >
                       <option value="all">All Status</option>
                       <option value="completed">Completed</option>
@@ -760,6 +761,7 @@ const TRDN: React.FC = () => {
                       value={timeRange}
                       onChange={(e) => setTimeRange(e.target.value)}
                       className="portal-px-3 portal-py-2 portal-border portal-rounded portal-bg-surface"
+                      aria-label="Select time range for temporal timeline"
                     >
                       <option value="1h">Last Hour</option>
                       <option value="6h">Last 6 Hours</option>
@@ -900,6 +902,8 @@ const TRDN: React.FC = () => {
                 <button
                   onClick={() => setSelectedSnapshot(null)}
                   className="portal-text-secondary hover:portal-text-primary"
+                  type="button"
+                  aria-label="Close snapshot details"
                 >
                   <X size={24} />
                 </button>
