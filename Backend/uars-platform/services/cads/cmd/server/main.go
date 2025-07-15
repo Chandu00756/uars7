@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -100,6 +101,48 @@ func main() {
 		w.Write([]byte(fmt.Sprintf(`{"status":"healthy","service":"cads","timestamp":%d}`,
 			time.Now().Unix())))
 	}).Methods("GET")
+
+	// CADS Dashboard API endpoints
+	root.HandleFunc("/api/cads/metrics", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+		w.Header().Set("Content-Type", "application/json")
+
+		// Generate realistic metrics for the dashboard
+		metrics := map[string]interface{}{
+			"activeCells":        30 + (time.Now().Unix() % 20),
+			"genomeFitness":      75 + (time.Now().Unix() % 20),
+			"threatsNeutralized": time.Now().Unix() % 15,
+			"avgResponseTime":    8.0 + float64(time.Now().Unix()%7),
+			"systemLoad":         20.0 + float64(time.Now().Unix()%40),
+			"intentTokens":       50 + (time.Now().Unix() % 100),
+			"timestamp":          time.Now().Unix(),
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(metrics)
+	}).Methods("GET", "OPTIONS")
+
+	root.HandleFunc("/api/cads/microcells", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+		w.Header().Set("Content-Type", "application/json")
+
+		// Return current pool status
+		cells := make([]map[string]interface{}, 0)
+		for i := 0; i < poolSize; i++ {
+			cell := map[string]interface{}{
+				"id":         fmt.Sprintf("cell-%d", i),
+				"status":     "active",
+				"runtime":    "wasmtime",
+				"ttl":        10 + (i % 20),
+				"memoryUsed": 1 + (i % 31),
+				"lastSeen":   time.Now().Add(-time.Duration(i*30) * time.Second),
+			}
+			cells = append(cells, cell)
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(cells)
+	}).Methods("GET", "OPTIONS")
 
 	// CORS setup
 	c := cors.New(cors.Options{
