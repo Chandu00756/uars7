@@ -244,6 +244,7 @@ const ILECG: React.FC = () => {
                   value={activeFilter} 
                   onChange={(e) => setActiveFilter(e.target.value)}
                   className="portal-px-3 portal-py-1 portal-rounded portal-border portal-text-sm"
+                  aria-label="Filter correlations by severity level"
                 >
                   <option value="all">All Severities</option>
                   <option value="critical">Critical</option>

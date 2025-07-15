@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { startAuthentication } from "@simplewebauthn/browser";
 import { useNavigate } from "react-router-dom";
 import {
@@ -15,6 +15,7 @@ import {
   getLoginOptions,
   finishLogin,
 } from "../services/authService";
+import { AuthContext } from "../contexts/AuthContext";
 
 /* ──────────────── Utils ────────────────────── */
 const toBase64Url = (str: string) =>
@@ -54,6 +55,7 @@ const LoginCard = styled(Paper)(({ theme }) => ({
 /* ──────────────── Component ────────────────── */
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -90,9 +92,11 @@ export default function Login() {
       const resp = await finishLogin({ username, assertion });
       console.log("[Login] finishLogin response:", resp);
 
-      // 5. persist real token if available
-      if (resp.status === 200 && resp.data?.token) {
-        localStorage.setItem("authToken", resp.data.token);
+      // 5. Check if login was successful (backend uses session-based auth)
+      if (resp.status === 200 && resp.data === "success") {
+        // Backend uses session cookies, no need to store tokens
+        console.log("✅ Login successful, updating auth state and redirecting");
+        login(); // Update auth context
         navigate("/dashboard");
       } else {
         throw new Error("Backend rejected the assertion.");
@@ -180,7 +184,6 @@ export default function Login() {
               Passwordless authentication with your registered device.
             </Typography>
 
-            <AnimatePresence>
             <Box sx={{ mb: 2, width: '100%' }}>
               <input
                 type="text"
@@ -200,8 +203,11 @@ export default function Login() {
                 autoFocus
               />
             </Box>
+
+            <AnimatePresence>
               {error && (
                 <motion.div
+                  key="error-message"
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0, transition: { duration: 0.3 } }}
                   exit={{ opacity: 0, y: 16, transition: { duration: 0.2 } }}

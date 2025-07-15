@@ -12,7 +12,13 @@ export interface IntentToken {
   action: string;
   issuedAt: string;
   expiresAt: string;
-  status: string;
+  status: 'active' | 'expired' | 'revoked';
+  usageCount: number;
+  maxUsage?: number;
+  lastUsed?: Date;
+  deviceBinding?: string;
+  scope: string[];
+  description?: string;
 }
 
 export interface Capsule {

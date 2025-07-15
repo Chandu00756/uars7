@@ -1,0 +1,1715 @@
+/* ====================================================================
+   CADS - Convergent Autonomic Defense Sphere Styles
+   Professional Military-Grade Interface with Advanced Animations
+   ==================================================================== */
+
+/* -------------------- CADS Base Layout -------------------- */
+.cads-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0b0d 0%, #1a1d23 100%);
+  color: #ffffff;
+  font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.cads-header {
+  background: rgba(10, 11, 13, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 1rem 2rem;
+}
+
+.cads-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1920px;
+  margin: 0 auto;
+}
+
+.cads-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.cads-subtitle {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 0.25rem;
+}
+
+.cads-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cads-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.cads-status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: #00d4ff;
+  animation: pulse-glow 2s infinite;
+}
+
+/* -------------------- CADS Navigation (Modern) -------------------- */
+
+/* -------------------- CADS Main Content -------------------- */
+.cads-main {
+  padding: 2rem;
+  max-width: 1920px;
+  margin: 0 auto;
+}
+
+.cads-content-wrapper {
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* -------------------- KPI Cards -------------------- */
+.cads-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.cads-kpi-card {
+  background: linear-gradient(145deg, rgba(26, 29, 35, 0.8) 0%, rgba(15, 23, 42, 0.6) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cads-kpi-card:hover {
+  transform: translateY(-2px) scale(1.02);
+  border-color: rgba(0, 212, 255, 0.3);
+  box-shadow: 0 10px 40px rgba(0, 212, 255, 0.1);
+}
+
+.cads-kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #00d4ff 0%, #0099cc 50%, #7c3aed 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.cads-kpi-card:hover::before {
+  opacity: 1;
+}
+
+.cads-kpi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.cads-kpi-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cads-kpi-icon {
+  width: 2rem;
+  height: 2rem;
+  color: #00d4ff;
+  background: rgba(0, 212, 255, 0.1);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cads-kpi-value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffffff 0%, #00d4ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.cads-kpi-trend {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.cads-kpi-trend.positive {
+  color: #10b981;
+}
+
+.cads-kpi-trend.negative {
+  color: #ef4444;
+}
+
+.cads-kpi-trend.neutral {
+  color: #f59e0b;
+}
+
+/* -------------------- Live Cells Grid -------------------- */
+.cads-cells-container {
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.cads-cells-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(26, 29, 35, 0.6);
+}
+
+.cads-cells-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.cads-cells-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cads-search-input {
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+  color: #ffffff;
+  font-size: 0.875rem;
+  width: 250px;
+  transition: all 0.3s ease;
+}
+
+.cads-search-input:focus {
+  outline: none;
+  border-color: #00d4ff;
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+}
+
+.cads-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.cads-filter-dropdown {
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+  color: #ffffff;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cads-filter-dropdown:focus {
+  outline: none;
+  border-color: #00d4ff;
+}
+
+.cads-action-button {
+  padding: 0.5rem 1rem;
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 0.5rem;
+  color: #00d4ff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cads-action-button:hover {
+  background: rgba(0, 212, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+/* -------------------- Data Grid -------------------- */
+.cads-grid {
+  overflow-x: auto;
+  -ms-overflow-style: none;
+}
+
+.cads-grid::-webkit-scrollbar {
+  height: 8px;
+}
+
+.cads-grid::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.cads-grid::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.cads-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.cads-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(26, 29, 35, 0.5);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.cads-table th:hover {
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+}
+
+.cads-table td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
+}
+
+.cads-table tr {
+  transition: all 0.2s ease;
+}
+
+.cads-table tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+  transform: scale(1.001);
+}
+
+/* -------------------- Cell Status Indicators -------------------- */
+.cads-cell-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  color: #00d4ff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cads-cell-id:hover {
+  text-decoration: underline;
+  transform: scale(1.05);
+}
+
+.cads-status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.cads-status-badge.running {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.cads-status-badge.completed {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.cads-status-badge.quarantined {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.cads-status-badge.pending {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.cads-risk-score {
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.cads-risk-score.low {
+  color: #10b981;
+}
+
+.cads-risk-score.medium {
+  color: #f59e0b;
+}
+
+.cads-risk-score.high {
+  color: #ef4444;
+}
+
+.cads-risk-score.critical {
+  color: #dc2626;
+  animation: pulse-danger 2s infinite;
+}
+
+/* -------------------- Action Buttons -------------------- */
+.cads-cell-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.cads-cell-action-btn {
+  padding: 0.375rem;
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cads-cell-action-btn.inspect {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.cads-cell-action-btn.inspect:hover {
+  background: rgba(59, 130, 246, 0.2);
+  transform: scale(1.1);
+}
+
+.cads-cell-action-btn.terminate {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.cads-cell-action-btn.terminate:hover {
+  background: rgba(239, 68, 68, 0.2);
+  transform: scale(1.1);
+}
+
+.cads-cell-action-btn.rollback {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.cads-cell-action-btn.rollback:hover {
+  background: rgba(245, 158, 11, 0.2);
+  transform: scale(1.1);
+}
+
+/* -------------------- Memory Sparkline -------------------- */
+.cads-memory-sparkline {
+  width: 60px;
+  height: 20px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.cads-sparkline-path {
+  stroke: #00d4ff;
+  stroke-width: 2;
+  fill: none;
+  filter: drop-shadow(0 0 4px rgba(0, 212, 255, 0.3));
+}
+
+/* -------------------- Inspector Drawer -------------------- */
+.cads-inspector-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.cads-inspector-drawer {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.95) 0%, rgba(26, 29, 35, 0.9) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.cads-inspector-header {
+  display: flex;
+  align-items: center;
+  justify-content: between;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cads-inspector-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.cads-inspector-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 0.5rem;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cads-inspector-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.cads-inspector-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cads-inspector-tab {
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.cads-inspector-tab:hover {
+  color: #ffffff;
+}
+
+.cads-inspector-tab.active {
+  color: #00d4ff;
+  border-bottom-color: #00d4ff;
+}
+
+.cads-inspector-content {
+  min-height: 300px;
+}
+
+/* -------------------- Metrics and Charts -------------------- */
+.cads-chart-container {
+  background: rgba(26, 29, 35, 0.6);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cads-chart-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 1rem;
+}
+
+.cads-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.cads-metric-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+.cads-metric-label {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.5rem;
+}
+
+.cads-metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #00d4ff;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* -------------------- Policy Editor -------------------- */
+.cads-policy-editor {
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.cads-editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: rgba(26, 29, 35, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cads-editor-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.cads-editor-button {
+  padding: 0.5rem 1rem;
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 0.375rem;
+  color: #00d4ff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cads-editor-button:hover {
+  background: rgba(0, 212, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.cads-editor-button.primary {
+  background: #00d4ff;
+  color: #000000;
+}
+
+.cads-editor-button.primary:hover {
+  background: #0099cc;
+}
+
+.cads-editor-textarea {
+  width: 100%;
+  min-height: 400px;
+  padding: 1.5rem;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+}
+
+/* -------------------- Intent Token Generator -------------------- */
+.cads-token-generator {
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2rem;
+}
+
+.cads-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.cads-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cads-form-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.cads-form-input,
+.cads-form-select {
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+  color: #ffffff;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.cads-form-input:focus,
+.cads-form-select:focus {
+  outline: none;
+  border-color: #00d4ff;
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+}
+
+.cads-generated-token {
+  background: rgba(26, 29, 35, 0.8);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.cads-token-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  color: #00d4ff;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  word-break: break-all;
+  margin: 1rem 0;
+}
+
+/* -------------------- Genome Explorer -------------------- */
+.cads-genome-scatter {
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.cads-scatter-plot {
+  width: 100%;
+  height: 400px;
+  position: relative;
+}
+
+.cads-scatter-point {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.cads-scatter-point:hover {
+  transform: scale(1.5);
+  z-index: 10;
+}
+
+.cads-scatter-point.high-fitness {
+  background: #10b981;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+
+.cads-scatter-point.medium-fitness {
+  background: #f59e0b;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+}
+
+.cads-scatter-point.low-fitness {
+  background: #ef4444;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+
+/* -------------------- Alert Stream -------------------- */
+.cads-alert-stream {
+  max-height: 500px;
+  overflow-y: auto;
+  -ms-overflow-style: none;
+}
+
+.cads-alert-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
+}
+
+.cads-alert-item:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.cads-alert-icon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cads-alert-icon.critical {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.cads-alert-icon.warning {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+
+.cads-alert-icon.info {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+}
+
+.cads-alert-content {
+  flex: 1;
+}
+
+.cads-alert-title {
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.25rem;
+}
+
+.cads-alert-description {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.cads-alert-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 0.5rem;
+}
+
+/* -------------------- Settings Panel -------------------- */
+.cads-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+}
+
+.cads-settings-section {
+  background: rgba(26, 29, 35, 0.6);
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+}
+
+.cads-settings-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cads-setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cads-setting-item:last-child {
+  border-bottom: none;
+}
+
+.cads-setting-info {
+  flex: 1;
+}
+
+.cads-setting-name {
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.25rem;
+}
+
+.cads-setting-description {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* -------------------- Toggle Switch -------------------- */
+.cads-toggle {
+  position: relative;
+  width: 48px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cads-toggle.active {
+  background: #00d4ff;
+}
+
+.cads-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.cads-toggle.active .cads-toggle-thumb {
+  transform: translateX(24px);
+}
+
+/* -------------------- Responsive Design -------------------- */
+@media (max-width: 1200px) {
+  .cads-nav-button {
+    min-width: 70px;
+    max-width: 90px;
+    padding: 0.5rem 0.5rem;
+  }
+  
+  .nav-label {
+    font-size: 0.7rem;
+    max-width: 80px;
+  }
+  
+  .nav-description {
+    font-size: 0.45rem;
+    max-width: 80px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .cads-main {
+    padding: 1rem;
+  }
+  
+  .cads-content-wrapper {
+    padding: 1.5rem;
+  }
+  
+  .cads-kpi-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+  
+  .cads-header {
+    padding: 1rem;
+  }
+  
+  .cads-nav-tabs {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .cads-nav-container {
+    gap: 0.125rem;
+    padding: 0.75rem 0;
+  }
+  
+  .cads-nav-button {
+    min-width: 60px;
+    max-width: 70px;
+    padding: 0.375rem 0.25rem;
+  }
+  
+  .nav-label {
+    font-size: 0.625rem;
+    max-width: 60px;
+  }
+  
+  .nav-description {
+    display: none; /* Hide descriptions on small screens */
+  }
+  
+  .cads-main-content {
+    padding: 1rem;
+  }
+  
+  .cads-header-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .cads-quick-metrics {
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cads-nav-button {
+    min-width: 50px;
+    max-width: 60px;
+    padding: 0.25rem 0.125rem;
+  }
+  
+  .nav-label {
+    font-size: 0.55rem;
+    max-width: 50px;
+  }
+}
+
+/* -------------------- CADS Loading Screen -------------------- */
+.cads-loading-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0b0d 0%, #1a1d23 100%);
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+.cads-loading-logo {
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(0, 212, 255, 0.1);
+  border: 2px solid rgba(0, 212, 255, 0.3);
+  box-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
+}
+
+.cads-loading-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+}
+
+.cads-loading-subtitle {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 3rem;
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+.cads-loading-bar {
+  width: 400px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.cads-loading-progress {
+  height: 100%;
+  background: linear-gradient(90deg, #00d4ff 0%, #0099cc 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+.cads-loading-steps {
+  text-align: center;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.cads-loading-steps .step {
+  margin: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.cads-loading-steps .step.completed {
+  color: #10b981;
+}
+
+.cads-loading-steps .step.active {
+  color: #00d4ff;
+  animation: pulse-glow 2s infinite;
+}
+
+/* -------------------- CADS Header Logo -------------------- */
+.cads-logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cads-logo-text h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cads-logo-text span {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* -------------------- CADS Status Indicators -------------------- */
+.cads-status-indicators {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.cads-status-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.cads-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse-glow 2s infinite;
+}
+
+.cads-threat-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid;
+}
+
+/* -------------------- CADS Quick Metrics -------------------- */
+.cads-quick-metrics {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.cads-quick-metrics .metric {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* -------------------- CADS Navigation -------------------- */
+.cads-navigation {
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0 2rem;
+  overflow-x: auto;
+  -ms-overflow-style: none;
+}
+
+.cads-navigation::-webkit-scrollbar {
+  display: none;
+}
+
+.cads-nav-container {
+  display: flex;
+  gap: 0.25rem;
+  min-width: max-content;
+  padding: 1rem 0;
+  max-width: 100%;
+  margin: 0 auto;
+  justify-content: flex-start;
+}
+
+.cads-nav-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  min-width: 80px;
+  max-width: 120px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.cads-nav-button:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.cads-nav-button.active {
+  color: #00d4ff;
+  background: rgba(0, 212, 255, 0.1);
+  border-color: rgba(0, 212, 255, 0.3);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+}
+
+.cads-nav-button.active::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #00d4ff 0%, #0099cc 100%);
+  animation: tab-glow 3s infinite;
+}
+
+.nav-label {
+  font-weight: 600;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+}
+
+.nav-description {
+  font-size: 0.5rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 400;
+  white-space: nowrap;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* -------------------- CADS Main Content -------------------- */
+.cads-main-content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 100%;
+  margin: 0 auto;
+  width: 100%;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.cads-tab-content {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+}
+
+/* -------------------- CADS Footer -------------------- */
+.cads-footer {
+  background: rgba(10, 11, 13, 0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem 2rem;
+  font-size: 0.875rem;
+}
+
+.cads-footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1920px;
+  margin: 0 auto;
+}
+
+.cads-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.cads-footer-left .version {
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+}
+
+.cads-footer-left .uptime {
+  color: rgba(255, 255, 255, 0.5);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.cads-footer-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.system-metrics {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.metric-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.metric-label {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.metric-value {
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.cads-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.timestamp {
+  color: rgba(255, 255, 255, 0.8);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.timezone {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+}
+
+/* -------------------- Background Effects -------------------- */
+.cads-background-effects {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.grid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  opacity: 0.5;
+}
+
+.particle-system {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: rgba(0, 212, 255, 0.6);
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(0, 212, 255, 0.8);
+}
+
+/* -------------------- Emergency Alert Overlay -------------------- */
+.cads-emergency-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emergency-alert {
+  background: linear-gradient(145deg, rgba(239, 68, 68, 0.1) 0%, rgba(153, 27, 27, 0.1) 100%);
+  border: 2px solid rgba(239, 68, 68, 0.5);
+  border-radius: 1rem;
+  padding: 3rem;
+  text-align: center;
+  max-width: 500px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 60px rgba(239, 68, 68, 0.3);
+}
+
+.emergency-alert h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ef4444;
+  margin: 1rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.emergency-alert p {
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 2rem;
+  font-size: 0.875rem;
+}
+
+.emergency-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.emergency-button {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent;
+}
+
+.emergency-button.primary {
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.emergency-button.primary:hover {
+  background: rgba(239, 68, 68, 0.1);
+  transform: translateY(-1px);
+}
+
+.emergency-button.secondary {
+  color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.emergency-button.secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+/* -------------------- Responsive Design Updates -------------------- */
+@media (max-width: 1024px) {
+  .cads-nav-container {
+    gap: 0.25rem;
+  }
+  
+  .cads-nav-button {
+    min-width: 80px;
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .nav-label {
+    font-size: 0.75rem;
+  }
+  
+  .nav-description {
+    display: none;
+  }
+  
+  .cads-header-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .cads-footer-content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .system-metrics {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .cads-header,
+  .cads-navigation,
+  .cads-main-content,
+  .cads-footer {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .cads-nav-button {
+    min-width: 60px;
+    padding: 0.5rem;
+  }
+  
+  .nav-label {
+    font-size: 0.625rem;
+  }
+  
+  .cads-quick-metrics {
+    gap: 1rem;
+  }
+  
+  .cads-quick-metrics .metric {
+    font-size: 0.75rem;
+  }
+  
+  .emergency-alert {
+    margin: 1rem;
+    padding: 2rem;
+  }
+  
+  .emergency-actions {
+    flex-direction: column;
+  }
+}
+
+/* -------------------- Animations -------------------- */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 10px currentColor;
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 20px currentColor;
+  }
+}
+
+@keyframes tab-glow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes pulse-danger {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+    text-shadow: 0 0 10px currentColor;
+  }
+}
+
+@keyframes slide-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* -------------------- Utility Classes -------------------- */
+.cads-fade-in {
+  animation: fade-in 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cads-slide-up {
+  animation: slide-in-up 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cads-text-gradient {
+  background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cads-glow {
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+}
+
+.cads-border-glow {
+  border: 1px solid rgba(0, 212, 255, 0.5);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+}
+
+/* -------------------- Dark Mode Compatibility -------------------- */
+@media (prefers-color-scheme: light) {
+  .cads-container {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    color: #1a202c;
+  }
+  
+  .cads-content-wrapper {
+    background: rgba(255, 255, 255, 0.9);
+    color: #1a202c;
+  }
+  
+  .cads-kpi-card {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.8) 100%);
+    color: #1a202c;
+  }
+}
+
+/* -------------------- Loading States -------------------- */
+.cads-loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  border-top-color: #00d4ff;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.cads-skeleton {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.1) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* -------------------- Accessibility -------------------- */
+.cads-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.cads-focus-visible:focus-visible {
+  outline: 2px solid #00d4ff;
+  outline-offset: 2px;
+}
+
+/* -------------------- Print Styles -------------------- */
+@media print {
+  .cads-container {
+    background: white;
+    color: black;
+  }
+  
+  .cads-header,
+  .cads-nav-tabs,
+  .cads-action-button {
+    display: none;
+  }
+  
+  .cads-content-wrapper {
+    background: white;
+    border: 1px solid #000;
+  }
+}

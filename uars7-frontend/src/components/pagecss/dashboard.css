@@ -1341,6 +1341,7 @@ body {
   
   .portal-tab {
     white-space: nowrap;
+    min-width: -webkit-fill-available;
     min-width: fit-content;
   }
 }
@@ -2431,10 +2432,22 @@ body {
 .portal-cursor-not-allowed { cursor: not-allowed; }
 
 /* User Select Utilities */
-.portal-select-none { user-select: none; }
-.portal-select-text { user-select: text; }
-.portal-select-all { user-select: all; }
-.portal-select-auto { user-select: auto; }
+.portal-select-none { 
+  -webkit-user-select: none;
+  user-select: none; 
+}
+.portal-select-text { 
+  -webkit-user-select: text;
+  user-select: text; 
+}
+.portal-select-all { 
+  -webkit-user-select: all;
+  user-select: all; 
+}
+.portal-select-auto { 
+  -webkit-user-select: auto;
+  user-select: auto; 
+}
 
 /* Pointer Events Utilities */
 .portal-pointer-events-none { pointer-events: none; }

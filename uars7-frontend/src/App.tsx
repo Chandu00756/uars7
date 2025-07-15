@@ -27,15 +27,8 @@ import AdminPanel       from "./pages/AdminPanel";
 import PrivateRoute from "./components/PrivateRoute";
 import Footer       from "./components/Footer";
 import theme        from "./theme";
-import apiClient    from "./services/apiClient";
 import { AuthContext } from "./contexts/AuthContext";
-
-// Session check function
-async function checkSession(): Promise<boolean> {
-  // No /auth/me endpoint in backend; skip session check or use a supported endpoint if available
-  // For now, always return false (not authenticated) to avoid 404 errors
-  return false;
-}
+import { checkSession, logout as authLogout } from "./services/authService";
 
 function AppShell() {
   const [authState, setAuthState] = useState<{
@@ -64,7 +57,7 @@ function AppShell() {
   const logout = async () => {
     console.log("🚪 Logout function called");
     try {
-      await apiClient.post("/auth/logout");
+      await authLogout();
     } catch (error) {
       console.error("Logout error:", error);
     }

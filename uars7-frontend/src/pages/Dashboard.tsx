@@ -153,6 +153,7 @@ const GlobalHeader: React.FC<{
               e.stopPropagation();
               onSidebarToggle();
             }}
+            title={sidebarOpen ? "Close Sidebar" : "Open Sidebar"}
           >
             {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -197,7 +198,6 @@ const GlobalHeader: React.FC<{
               </button>
             ))}
           </div>
-          
           <button 
             className="portal-theme-toggle portal-ripple"
             onClick={(e) => {
@@ -205,16 +205,17 @@ const GlobalHeader: React.FC<{
               e.stopPropagation();
               onDarkModeToggle();
             }}
+            title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
           >
             {darkMode ? '🌙' : '☀️'}
           </button>
-          
           <button 
             className="portal-notifications portal-ripple"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
             }}
+            title="View Notifications"
           >
             <Bell size={18} />
             {notifications > 0 && (
@@ -262,8 +263,7 @@ const PrimarySidebar: React.FC<{
       {/* Mobile Overlay */}
       {isOpen && (
         <div 
-          className="portal-fixed portal-inset-0 portal-bg-primary portal-z-40 portal-lg:portal-hidden"
-          style={{ backgroundColor: 'rgba(27, 38, 59, 0.8)' }}
+          className="portal-fixed portal-inset-0 portal-bg-primary portal-z-40 portal-lg:portal-hidden portal-mobile-overlay"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -280,6 +280,8 @@ const PrimarySidebar: React.FC<{
             e.stopPropagation();
             onToggle();
           }}
+          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           <ChevronLeft size={16} style={{ 
             transform: isCollapsed ? 'rotate(180deg)' : 'rotate(0deg)',
@@ -365,76 +367,40 @@ const ContextRail: React.FC<{
   if (!isOpen) return null;
   
   return (
-    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999 }}>
+    <div className="portal-context-rail-overlay">
       <div 
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          cursor: 'pointer'
-        }}
+        className="portal-context-rail-backdrop"
         onClick={onClose}
       />
       
       <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          width: '320px',
-          height: '100%',
-          backgroundColor: '#1e293b',
-          boxShadow: '-4px 0 20px rgba(0, 0, 0, 0.3)',
-          overflowY: 'auto',
-          padding: '24px',
-          color: 'white'
-        }}
+        className="portal-context-rail-content"
         onClick={(e) => e.stopPropagation()}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: '600', margin: 0 }}>Filters</h3>
+        <div className="portal-filters-header">
+          <h3 className="portal-filters-title">Filters</h3>
           <button 
             onClick={onClose}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'white',
-              cursor: 'pointer',
-              padding: '8px',
-              borderRadius: '4px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
+            className="portal-close-button"
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            aria-label="Close filters"
+            title="Close filters"
           >
             <X size={20} />
           </button>
         </div>
         
-        <div style={{ marginBottom: '24px' }}>
-          <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: '#e2e8f0' }}>
+        <div className="portal-filter-section">
+          <h4 className="portal-filter-section-title">
             Time Range
           </h4>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <div className="portal-filter-button-group">
             {['1h', '6h', '24h', '7d', '30d'].map(range => (
               <button
                 key={range}
                 onClick={() => setTimeRange(range)}
-                style={{
-                  padding: '6px 12px',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                  backgroundColor: timeRange === range ? '#3b82f6' : '#374151',
-                  color: 'white',
-                  transition: 'all 0.2s'
-                }}
+                className={`portal-filter-button ${timeRange === range ? 'active' : ''}`}
                 onMouseEnter={(e) => {
                   if (timeRange !== range) {
                     e.currentTarget.style.backgroundColor = '#4b5563';
@@ -452,25 +418,16 @@ const ContextRail: React.FC<{
           </div>
         </div>
         
-        <div style={{ marginBottom: '24px' }}>
-          <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: '#e2e8f0' }}>
+        <div className="portal-filter-section">
+          <h4 className="portal-filter-section-title">
             Environment
           </h4>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <div className="portal-filter-button-group">
             {['PROD', 'STAGE', 'EDGE'].map(env => (
               <button 
                 key={env}
                 onClick={() => setEnvironment(env)}
-                style={{
-                  padding: '6px 12px',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                  backgroundColor: environment === env ? '#10b981' : '#6b7280',
-                  color: 'white',
-                  transition: 'all 0.2s'
-                }}
+                className={`portal-filter-button ${environment === env ? 'active' : ''}`}
                 onMouseEnter={(e) => {
                   if (environment !== env) {
                     e.currentTarget.style.backgroundColor = '#059669';
@@ -488,37 +445,20 @@ const ContextRail: React.FC<{
           </div>
         </div>
         
-        <div style={{ marginBottom: '24px' }}>
-          <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: '#e2e8f0' }}>
+        <div className="portal-filter-section">
+          <h4 className="portal-filter-section-title">
             Threat Levels
           </h4>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <div className="portal-filter-button-group">
             {activeFilters.map(filter => (
               <span 
                 key={filter}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '6px 12px',
-                  backgroundColor: '#f59e0b',
-                  color: 'white',
-                  borderRadius: '6px',
-                  fontSize: '12px'
-                }}
+                className="portal-filter-chip"
               >
                 {filter}
                 <button 
                   onClick={() => removeFilter(filter)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'white',
-                    cursor: 'pointer',
-                    padding: '0',
-                    fontSize: '14px',
-                    fontWeight: 'bold'
-                  }}
+                  className="portal-remove-filter-button"
                   onMouseEnter={(e) => e.currentTarget.style.color = '#ef4444'}
                   onMouseLeave={(e) => e.currentTarget.style.color = 'white'}
                 >
@@ -529,11 +469,11 @@ const ContextRail: React.FC<{
           </div>
         </div>
         
-        <div>
-          <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: '#e2e8f0' }}>
+        <div className="portal-quick-actions-section">
+          <h4 className="portal-filter-section-title">
             Quick Actions
           </h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div className="portal-quick-actions-buttons">
             {[
               { icon: Download, label: 'Export Report' },
               { icon: AlertTriangle, label: 'Create Alert' },
@@ -545,19 +485,7 @@ const ContextRail: React.FC<{
                   console.log(`${label} clicked`);
                   alert(`${label} action triggered!`);
                 }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px',
-                  backgroundColor: '#374151',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  transition: 'background-color 0.2s'
-                }}
+                className="portal-quick-action-button"
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4b5563'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#374151'}
               >
@@ -589,8 +517,7 @@ const SevenLayerHealthRibbon: React.FC = () => {
         {layers.map((layer, index) => (
           <div
             key={layer.name}
-            className={`portal-health-pill ${layer.status} portal-holo-border portal-slide-up`}
-            style={{ animationDelay: `${index * 100}ms` }}
+            className={`portal-health-pill ${layer.status} portal-holo-border portal-slide-up portal-animation-delay-${index * 100}`}
           >
             <div className="portal-pill-header">
               <span className="portal-pill-name portal-font-mono">{layer.name}</span>
@@ -741,10 +668,7 @@ const RiskHorizonHeatmap: React.FC = () => {
           <h3 className="portal-text-xl portal-font-semibold portal-mb-2">
             Risk Horizon - Threat Forecast
           </h3>
-          <div style={{ 
-            fontSize: '14px', 
-            color: '#8B949E' 
-          }}>
+          <div className="portal-risk-heatmap-header">
             <span>Last Update: {lastUpdate.toLocaleTimeString()}</span>
           </div>
         </div>
@@ -756,19 +680,7 @@ const RiskHorizonHeatmap: React.FC = () => {
               e.stopPropagation();
               setIsRealTime(!isRealTime);
             }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '6px 12px',
-              border: 'none',
-              background: 'transparent',
-              cursor: 'pointer',
-              fontSize: '13px',
-              fontWeight: '500',
-              color: isRealTime ? '#FF4C4C' : '#FFB800',
-              transition: 'all 0.2s ease'
-            }}
+            className={`portal-risk-heatmap-controls ${isRealTime ? 'portal-realtime-active' : 'portal-realtime-inactive'}`}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'scale(1.05)';
             }}
@@ -776,16 +688,11 @@ const RiskHorizonHeatmap: React.FC = () => {
               e.currentTarget.style.transform = 'scale(1)';
             }}
           >
-            <div style={{
-              width: '8px',
-              height: '8px',
-              borderRadius: '50%',
-              backgroundColor: isRealTime ? '#FF4C4C' : '#FFB800',
-              opacity: isRealTime ? pulseOpacity : 1,
-              transition: 'opacity 0.3s ease-in-out',
-              boxShadow: isRealTime ? `0 0 8px rgba(255, 76, 76, ${pulseOpacity * 0.6})` : 'none'
-            }} />
-            <span style={{ letterSpacing: '0.5px' }}>
+            <div 
+              className={`portal-realtime-indicator ${isRealTime ? 'active pulse-active' : 'inactive pulse-inactive'}`}
+              style={isRealTime ? { '--pulse-opacity': pulseOpacity } as React.CSSProperties : {}}
+            />
+            <span className="portal-realtime-text">
               {isRealTime ? 'LIVE' : 'PAUSED'}
             </span>
           </button>
@@ -797,6 +704,8 @@ const RiskHorizonHeatmap: React.FC = () => {
               setThreatFilter(e.target.value as any);
             }}
             className="portal-px-3 portal-py-1 portal-rounded portal-bg-white portal-text-white portal-text-sm"
+            aria-label="Filter threats by risk level"
+            title="Filter threats by risk level"
           >
             <option value="all">All Threats</option>
             <option value="high">High Risk</option>
@@ -924,14 +833,13 @@ const RiskHorizonHeatmap: React.FC = () => {
             max="100" 
             value={timePosition}
             onChange={(e) => setTimePosition(Number(e.target.value))}
-            className="portal-scrubber-input portal-w-full portal-h-2 portal-bg-secondary portal-rounded-lg portal-appearance-none portal-cursor-pointer"
-            style={{
-              background: `linear-gradient(to right, #415A77 0%, #415A77 ${timePosition}%, #1B263B ${timePosition}%, #1B263B 100%)`
-            }}
+            className="portal-scrubber-input portal-w-full portal-h-2 portal-bg-secondary portal-rounded-lg portal-appearance-none portal-cursor-pointer portal-time-scrubber"
+            aria-label="Time position scrubber"
+            title="Adjust time position"
           />
           <div 
-            className="portal-absolute portal-top-0 portal-w-4 portal-h-4 portal-bg-accent portal-rounded-full portal-transform portal--translate-y-1 portal-shadow-lg portal-transition-all"
-            style={{ left: `calc(${timePosition}% - 8px)` }}
+            className="portal-scrubber-thumb portal-scrubber-thumb-dynamic"
+            style={{ '--thumb-position': `calc(${timePosition}% - 8px)` } as React.CSSProperties}
           />
         </div>
         
@@ -950,29 +858,10 @@ const RiskHorizonHeatmap: React.FC = () => {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            style={{
-              marginTop: '24px',
-              padding: '20px',
-              backgroundColor: '#f8fafc',
-              border: '2px solid #e2e8f0',
-              borderRadius: '12px',
-              borderLeft: '4px solid #3b82f6',
-              color: '#1e293b',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-            }}
+            className="portal-threat-details"
           >
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'flex-start', 
-              marginBottom: '16px' 
-            }}>
-              <h4 style={{ 
-                fontSize: '18px', 
-                fontWeight: '600', 
-                margin: 0,
-                color: '#1e293b'
-              }}>
+            <div className="portal-threat-details-header">
+              <h4>
                 Threat Analysis - Grid [{selectedCell.x}, {selectedCell.y}]
               </h4>
               <button
@@ -981,17 +870,7 @@ const RiskHorizonHeatmap: React.FC = () => {
                   e.stopPropagation();
                   setSelectedCell(null);
                 }}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#64748b',
-                  cursor: 'pointer',
-                  fontSize: '20px',
-                  fontWeight: 'bold',
-                  padding: '4px 8px',
-                  borderRadius: '4px',
-                  transition: 'color 0.2s'
-                }}
+                className="portal-threat-details-close"
                 onMouseEnter={(e) => e.currentTarget.style.color = '#ef4444'}
                 onMouseLeave={(e) => e.currentTarget.style.color = '#64748b'}
               >
@@ -999,40 +878,24 @@ const RiskHorizonHeatmap: React.FC = () => {
               </button>
             </div>
             
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: '1fr 1fr', 
-              gap: '20px',
-              marginBottom: '20px'
-            }}>
+            <div className="portal-threat-grid">
               <div>
-                <h5 style={{ 
-                  fontWeight: '600', 
-                  marginBottom: '12px',
-                  color: '#374151',
-                  fontSize: '14px'
-                }}>
+                <h5>
                   Threat Details
                 </h5>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <div style={{ fontSize: '14px', color: '#4b5563' }}>
-                    <strong style={{ color: '#1f2937' }}>Type:</strong> {selectedCell.details.type}
+                <div className="portal-detail-column">
+                  <div className="portal-detail-row">
+                    <span className="portal-detail-label">Type:</span> {selectedCell.details.type}
                   </div>
-                  <div style={{ fontSize: '14px', color: '#4b5563' }}>
-                    <strong style={{ color: '#1f2937' }}>Sector:</strong> {selectedCell.details.sector}
+                  <div className="portal-detail-row">
+                    <span className="portal-detail-label">Sector:</span> {selectedCell.details.sector}
                   </div>
-                  <div style={{ fontSize: '14px', color: '#4b5563' }}>
-                    <strong style={{ color: '#1f2937' }}>Vector:</strong> {selectedCell.details.attackVector}
+                  <div className="portal-detail-row">
+                    <span className="portal-detail-label">Vector:</span> {selectedCell.details.attackVector}
                   </div>
-                  <div style={{ fontSize: '14px', color: '#4b5563' }}>
-                    <strong style={{ color: '#1f2937' }}>Source IP:</strong> 
-                    <code style={{ 
-                      backgroundColor: '#f1f5f9', 
-                      padding: '2px 6px', 
-                      borderRadius: '4px',
-                      marginLeft: '8px',
-                      color: '#0f172a'
-                    }}>
+                  <div className="portal-detail-row">
+                    <span className="portal-detail-label">Source IP:</span> 
+                    <code className="portal-source-ip-code">
                       {selectedCell.details.sourceIP}
                     </code>
                   </div>
@@ -1040,33 +903,22 @@ const RiskHorizonHeatmap: React.FC = () => {
               </div>
               
               <div>
-                <h5 style={{ 
-                  fontWeight: '600', 
-                  marginBottom: '12px',
-                  color: '#374151',
-                  fontSize: '14px'
-                }}>
+                <h5>
                   Risk Assessment
                 </h5>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <div style={{ fontSize: '14px', color: '#4b5563' }}>
-                    <strong style={{ color: '#1f2937' }}>Risk Score:</strong> {selectedCell.details.riskScore}/1000
+                <div className="portal-detail-column">
+                  <div className="portal-detail-row">
+                    <span className="portal-detail-label">Risk Score:</span> {selectedCell.details.riskScore}/1000
                   </div>
-                  <div style={{ fontSize: '14px', color: '#4b5563' }}>
-                    <strong style={{ color: '#1f2937' }}>Confidence:</strong> {selectedCell.details.confidence}%
+                  <div className="portal-detail-row">
+                    <span className="portal-detail-label">Confidence:</span> {selectedCell.details.confidence}%
                   </div>
-                  <div style={{ fontSize: '14px', color: '#4b5563' }}>
-                    <strong style={{ color: '#1f2937' }}>Intensity:</strong> {Math.floor(selectedCell.intensity * 100)}%
+                  <div className="portal-detail-row">
+                    <span className="portal-detail-label">Intensity:</span> {Math.floor(selectedCell.intensity * 100)}%
                   </div>
-                  <div style={{ fontSize: '14px', color: '#4b5563' }}>
-                    <strong style={{ color: '#1f2937' }}>Classification:</strong>
-                    <span style={{
-                      marginLeft: '8px',
-                      fontWeight: 'bold',
-                      color: selectedCell.threat === 'high' ? '#dc2626' :
-                             selectedCell.threat === 'medium' ? '#d97706' :
-                             '#059669'
-                    }}>
+                  <div className="portal-detail-row">
+                    <span className="portal-detail-label">Classification:</span>
+                    <span className={`portal-threat-classification portal-threat-${selectedCell.threat}`}>
                       {selectedCell.threat.toUpperCase()}
                     </span>
                   </div>
@@ -1074,13 +926,7 @@ const RiskHorizonHeatmap: React.FC = () => {
               </div>
             </div>
             
-            <div style={{ 
-              display: 'flex', 
-              gap: '12px', 
-              flexWrap: 'wrap',
-              paddingTop: '16px',
-              borderTop: '1px solid #e2e8f0'
-            }}>
+            <div className="portal-action-buttons">
               <button 
                 onClick={(e) => {
                   e.preventDefault();
@@ -1088,26 +934,7 @@ const RiskHorizonHeatmap: React.FC = () => {
                   console.log('Investigate clicked for cell:', selectedCell);
                   alert('Investigate action triggered!');
                 }}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#3b82f6',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  boxShadow: '0 2px 4px rgba(59, 130, 246, 0.3)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#2563eb';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#3b82f6';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
+                className="portal-action-button portal-action-primary"
               >
                 Investigate
               </button>
@@ -1119,26 +946,7 @@ const RiskHorizonHeatmap: React.FC = () => {
                   console.log('Block Source clicked for:', selectedCell.details.sourceIP);
                   alert(`Block Source ${selectedCell.details.sourceIP} action triggered!`);
                 }}
-                style={{
-                  padding: '10px 16px',
-                  backgroundColor: '#dc2626',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  boxShadow: '0 2px 4px rgba(220, 38, 38, 0.3)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#b91c1c';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#dc2626';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
+                className="portal-action-button portal-action-warning"
               >
                 Block Source
               </button>
@@ -1150,27 +958,7 @@ const RiskHorizonHeatmap: React.FC = () => {
                   console.log('Create Rule clicked for threat type:', selectedCell.details.type);
                   alert(`Create Rule for ${selectedCell.details.type} action triggered!`);
                 }}
-                style={{
-                  padding: '10px 16px',
-                  backgroundColor: 'transparent',
-                  color: '#374151',
-                  border: '2px solid #d1d5db',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f3f4f6';
-                  e.currentTarget.style.borderColor = '#9ca3af';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.borderColor = '#d1d5db';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
+                className="portal-action-button portal-action-outline"
               >
                 Create Rule
               </button>
@@ -1266,8 +1054,7 @@ const LedgerThroughputCard: React.FC = () => {
           {recentTransactions.map((tx, i) => (
             <div 
               key={tx.hash}
-              className="portal-stream-item portal-flex portal-items-center portal-justify-between portal-p-2 portal-bg-primary portal-bg-opacity-5 portal-rounded portal-slide-left"
-              style={{ animationDelay: `${i * 100}ms` }}
+              className={`portal-stream-item portal-flex portal-items-center portal-justify-between portal-p-2 portal-bg-primary portal-bg-opacity-5 portal-rounded portal-slide-left portal-animation-delay-${i * 100}`}
             >
               <div className="portal-flex portal-items-center portal-gap-2">
                 <code className="portal-text-xs portal-font-mono portal-text-secondary">
@@ -1325,8 +1112,7 @@ const BottomTiles: React.FC = () => {
           {intentTokens.map((token, index) => (
             <div 
               key={token.name}
-              className="portal-intent-item portal-slide-left"
-              style={{ animationDelay: `${index * 100}ms` }}
+              className={`portal-intent-item portal-slide-left portal-animation-delay-${index * 100}`}
             >
               <div className="portal-intent-info portal-flex-1">
                 <div className="portal-flex portal-items-center portal-justify-between portal-mb-1">
@@ -1339,11 +1125,8 @@ const BottomTiles: React.FC = () => {
                 </div>
                 <div className="portal-intent-bar portal-relative portal-h-2 portal-bg-primary portal-bg-opacity-10 portal-rounded-full portal-overflow-hidden">
                   <div 
-                    className={`portal-intent-fill portal-h-full ${token.color} portal-rounded-full portal-transition-all portal-duration-1000`}
-                    style={{ 
-                      width: `${token.usage}%`,
-                      animationDelay: `${500 + index * 100}ms`
-                    }}
+                    className={`portal-intent-fill portal-intent-fill-dynamic portal-h-full ${token.color} portal-rounded-full portal-transition-all portal-duration-1000 portal-animation-delay-${500 + index * 100}`}
+                    style={{ '--progress-width': `${token.usage}%` } as React.CSSProperties}
                   />
                 </div>
               </div>
@@ -1361,71 +1144,16 @@ const BottomTiles: React.FC = () => {
         </h4>
         <div className="portal-gauge-container portal-flex portal-flex-col portal-items-center portal-justify-center portal-h-48">
           <div className="portal-relative portal-w-48 portal-h-32 portal-mb-4">
-            <div
-              style={{
-                width: '200px',
-                height: '100px',
-                position: 'relative',
-                overflow: 'hidden',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <div
-                style={{
-                  width: '160px',
-                  height: '80px',
-                  border: '12px solid rgba(100, 116, 139, 0.3)',
-                  borderBottom: 'none',
-                  borderRadius: '80px 80px 0 0',
-                  position: 'absolute',
-                  top: '10px',
-                  left: '20px',
-                  boxSizing: 'border-box'
-                }}
-              />
+            <div className="portal-gauge-semicircle">
+              <div className="portal-gauge-background" />
               
-              <div
-                style={{
-                  width: '160px',
-                  height: '80px',
-                  position: 'absolute',
-                  top: '10px',
-                  left: '20px',
-                  borderRadius: '80px 80px 0 0',
-                  background: `conic-gradient(from 180deg, #FF7F50 0%, #FFD700 36%, #00FF88 73%, transparent 73%)`,
-                  mask: 'radial-gradient(circle at center bottom, transparent 68px, black 68px, black 80px, transparent 80px)',
-                  WebkitMask: 'radial-gradient(circle at center bottom, transparent 68px, black 68px, black 80px, transparent 80px)',
-                  transition: 'all 2s ease'
-                }}
-              />
+              <div className="portal-gauge-fill" />
               
-              <div style={{
-                position: 'absolute',
-                bottom: '8px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                zIndex: 10
-              }}>
-                <span style={{ 
-                  fontSize: '32px', 
-                  fontWeight: 'bold',
-                                    color: '#3b82f6',
-                  marginBottom: '4px',
-                  textShadow: 'none'
-                }}>
+              <div className="portal-gauge-labels">
+                <span className="portal-gauge-value">
                   73%
                 </span>
-                <span style={{ 
-                  fontSize: '14px', 
-                  color: '#64748b',
-                  fontFamily: 'monospace',
-                  letterSpacing: '0.5px'
-                }}>
+                <span className="portal-gauge-label">
                   CONSENSUS
                 </span>
               </div>
@@ -1468,8 +1196,7 @@ const BottomTiles: React.FC = () => {
             {securityEvents.map((event, idx) => (
               <div 
                 key={idx}
-                className="portal-event-item portal-flex portal-items-center portal-gap-3 portal-p-2 portal-bg-primary portal-bg-opacity-5 portal-rounded portal-slide-left"
-                style={{ animationDelay: `${idx * 100}ms` }}
+                className={`portal-event-item portal-flex portal-items-center portal-gap-3 portal-p-2 portal-bg-primary portal-bg-opacity-5 portal-rounded portal-slide-left portal-animation-delay-${idx * 100}`}
               >
                 <div className="portal-flex portal-items-center portal-gap-2">
                   <event.icon 
@@ -1501,8 +1228,7 @@ const BottomTiles: React.FC = () => {
           {systemResources.map((resource, index) => (
             <div 
               key={resource.name}
-              className="portal-resource-item portal-slide-left"
-              style={{ animationDelay: `${index * 100}ms` }}
+              className={`portal-resource-item portal-slide-left portal-animation-delay-${index * 100}`}
             >
               <div className="portal-flex portal-items-center portal-justify-between portal-mb-2">
                 <div className="portal-flex portal-items-center portal-gap-2">
@@ -1517,15 +1243,12 @@ const BottomTiles: React.FC = () => {
               </div>
               <div className="portal-relative portal-h-2 portal-bg-primary portal-bg-opacity-10 portal-rounded-full portal-overflow-hidden">
                 <div 
-                  className={`portal-h-full ${
+                  className={`portal-h-full portal-intent-fill-dynamic ${
                     resource.value > 80 ? 'portal-bg-error' :
                     resource.value > 60 ? 'portal-bg-warning' :
                     'portal-bg-success'
-                  } portal-rounded-full portal-transition-all portal-duration-1000`}
-                  style={{ 
-                    width: `${resource.value}%`,
-                    animationDelay: `${500 + index * 100}ms`
-                  }}
+                  } portal-rounded-full portal-transition-all portal-duration-1000 portal-animation-delay-${500 + index * 100}`}
+                  style={{ '--progress-width': `${resource.value}%` } as React.CSSProperties}
                 />
               </div>
             </div>
