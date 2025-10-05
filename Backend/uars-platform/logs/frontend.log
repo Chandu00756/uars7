@@ -1,0 +1,19 @@
+
+> uars7-frontend@1.0.0 dev
+> vite
+
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+  VITE v5.4.19  ready in 178 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+11:08:19 AM [vite] hmr update /src/App.tsx, /src/pages/Register.tsx, /src/pages/Login.tsx
+11:08:19 AM [vite] hmr update /src/pages/Login.tsx
+11:10:34 AM [vite] hmr update /src/pages/Login.tsx
+11:10:43 AM [vite] hmr update /src/pages/Login.tsx
+11:10:50 AM [vite] hmr update /src/pages/Login.tsx
+11:11:15 AM [vite] hmr update /src/App.tsx, /src/pages/Register.tsx, /src/pages/Login.tsx
+11:11:33 AM [vite] hmr update /src/pages/Login.tsx
+11:11:42 AM [vite] hmr update /src/pages/Login.tsx
+11:13:41 AM [vite] hmr update /src/pages/Login.tsx

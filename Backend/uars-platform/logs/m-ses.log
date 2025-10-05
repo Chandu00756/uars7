@@ -1,0 +1,46 @@
+2025/10/05 11:08:02 Config file not found, using defaults
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /health                   --> main.main.func2.1 (3 handlers)
+[GIN-debug] POST   /api/security/validate    --> main.main.func2.2 (3 handlers)
+[GIN-debug] POST   /api/security/enforce     --> main.main.func2.3 (3 handlers)
+time="2025-10-05T11:08:02-04:00" level=info msg="M-SES HTTP server starting on :8081"
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on :8081
+time="2025-10-05T11:08:02-04:00" level=info msg="M-SES gRPC server starting on :50052"
+[GIN] 2025/10/05 - 11:08:09 | 200 |     402.375µs |             ::1 | GET      "/health"
+[GIN] 2025/10/05 - 11:08:15 | 404 |         250ns |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:08:30 | 404 |         500ns |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:08:45 | 404 |         2.5µs |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:09:00 | 404 |         666ns |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:09:15 | 404 |       4.292µs |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:09:30 | 404 |       1.833µs |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:09:45 | 404 |       20.25µs |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:10:00 | 404 |       2.083µs |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:10:15 | 404 |        2.25µs |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:10:30 | 404 |         208ns |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:10:45 | 404 |         375ns |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:11:00 | 404 |         583ns |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:11:15 | 404 |         417ns |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:11:30 | 404 |         417ns |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:11:45 | 404 |       1.584µs |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:12:00 | 404 |       36.75µs |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:12:15 | 404 |      25.375µs |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:12:30 | 404 |       3.083µs |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:12:45 | 404 |       2.625µs |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:13:00 | 404 |       3.334µs |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:13:15 | 404 |       2.708µs |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:13:30 | 404 |       2.792µs |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:13:45 | 404 |       2.667µs |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:14:00 | 404 |       3.167µs |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:14:15 | 404 |       8.708µs |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:14:30 | 404 |       8.208µs |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:14:45 | 404 |       5.667µs |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:15:00 | 404 |      23.125µs |       127.0.0.1 | GET      "/metrics"
+[GIN] 2025/10/05 - 11:15:17 | 404 |       1.709µs |       127.0.0.1 | GET      "/metrics"
+time="2025-10-05T11:16:36-04:00" level=info msg="Shutting down M-SES service..."
