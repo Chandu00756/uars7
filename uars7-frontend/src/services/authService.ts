@@ -10,8 +10,8 @@ export const finishRegistration = (attestation: any) =>
 export const getLoginOptions = (payload: any) =>
   apiClient.post("/auth/login/begin", payload);
 
-export const finishLogin = (assertion: any) =>
-  apiClient.post("/auth/login/finish", assertion);
+export const finishLogin = (payload: { username: string; assertion: any }) =>
+  apiClient.post("/auth/login/finish", payload);
 
 export const checkSession = async (): Promise<boolean> => {
   try {
@@ -42,6 +42,7 @@ export const logout = async () => {
   } catch (error) {
     console.warn("Logout request failed:", error);
   }
-  // Clear any local storage if needed
+  // Clear all authentication data
   localStorage.removeItem("authToken");
+  localStorage.removeItem("role");
 };

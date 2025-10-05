@@ -2,7 +2,13 @@ module github.com/portalvii/uars7
 
 go 1.24.4
 
-require github.com/spf13/viper v1.20.1
+require (
+	github.com/portalvii/uars7/services/m-ses/internal/enforcement v0.0.0-00010101000000-000000000000
+	github.com/portalvii/uars7/services/m-ses/internal/security v0.0.0-00010101000000-000000000000
+	github.com/spf13/viper v1.20.1
+	golang.org/x/time v0.12.0
+	google.golang.org/grpc v1.67.3
+)
 
 require (
 	github.com/bytedance/sonic v1.11.6 // indirect
@@ -44,16 +50,14 @@ require (
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/mod v0.25.0 // indirect
 	golang.org/x/net v0.41.0 // indirect
-	golang.org/x/time v0.12.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241223144023-3abc09e42ca8 // indirect
-	google.golang.org/grpc v1.67.3 // indirect
 	google.golang.org/protobuf v1.36.1 // indirect
 )
 
 require (
 	github.com/cloudflare/cfssl v1.6.5 // indirect
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
-	github.com/duo-labs/webauthn v0.0.0-20221205164246-ebaf9b74c6ec // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/duo-labs/webauthn v0.0.0-20221205164246-ebaf9b74c6ec
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.8.0 // indirect
 	github.com/gin-gonic/gin v1.10.1
@@ -61,15 +65,15 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
 	github.com/google/certificate-transparency-go v1.1.7 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/gorilla/mux v1.8.1 // indirect
+	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/securecookie v1.1.2 // indirect
-	github.com/gorilla/sessions v1.4.0 // indirect
+	github.com/gorilla/sessions v1.4.0
 	github.com/hyperledger/fabric-contract-api-go v1.2.2
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
-	github.com/rs/cors v1.11.1 // indirect
+	github.com/rs/cors v1.11.1
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
-	github.com/sirupsen/logrus v1.9.3 // indirect
+	github.com/sirupsen/logrus v1.9.3
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.12.0 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
@@ -78,7 +82,7 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.40.0 // indirect
+	golang.org/x/crypto v0.40.0
 	golang.org/x/sys v0.34.0 // indirect
 	golang.org/x/text v0.27.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
@@ -87,4 +91,6 @@ require (
 replace (
 	github.com/portalvii/uars7/Backend/uars-platform/services/adcf/internal/capsules => ./Backend/uars-platform/services/adcf/internal/capsules
 	github.com/portalvii/uars7/Backend/uars-platform/services/adcf/internal/policy => ./Backend/uars-platform/services/adcf/internal/policy
+	github.com/portalvii/uars7/services/m-ses/internal/enforcement => ./services/m-ses/internal/enforcement
+	github.com/portalvii/uars7/services/m-ses/internal/security => ./services/m-ses/internal/security
 )

@@ -156,7 +156,7 @@ func main() {
 
 	// Server setup
 	srv := &http.Server{
-		Addr:         ":8080",
+		Addr:         ":8082",
 		Handler:      handler,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
@@ -165,7 +165,7 @@ func main() {
 
 	// Start server in goroutine
 	go func() {
-		log.Printf("CADS server starting on :8080")
+		log.Printf("CADS server starting on :8082")
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Failed to start server: %v", err)
 		}

@@ -39,7 +39,7 @@ func NewWebAuthnHandler(us *store.MemoryUserStore) *WebAuthnHandler {
 	wa, err := webauthn.New(&webauthn.Config{
 		RPDisplayName: "UARS7 Platform",
 		RPID:          "localhost",             // In production: your domain
-		RPOrigin:      "http://localhost:5174", // In production: https://yourdomain.com
+		RPOrigin:      "http://localhost:5173", // In production: https://yourdomain.com
 		RPIcon:        "",                      // Optional: your icon URL
 		// Enhanced timeout for better security
 		Timeout: 60000, // 60 seconds
@@ -54,8 +54,8 @@ func NewWebAuthnHandler(us *store.MemoryUserStore) *WebAuthnHandler {
 		Timeout:                 60 * time.Second,
 		MaxCredentials:          5, // Limit credentials per user
 		AllowedOrigins: []string{
-			"http://localhost:5174",
 			"http://localhost:5173",
+			"http://localhost:5174",
 			"http://localhost:3000",
 		},
 	}

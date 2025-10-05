@@ -58,16 +58,30 @@ export default function Login() {
   const { login } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
 
   const [username, setUsername] = useState("");
 
   const handleLogin = async () => {
     console.log("[Login] Attempting login for username:", username);
     setError(null);
+    setMessage(null);
     setLoading(true);
+    
     try {
+      // Validate username
+      if (!username || username.trim().length === 0) {
+        throw new Error("Please enter a username");
+      }
+      
+      if (username.trim().length < 3) {
+        throw new Error("Username must be at least 3 characters long");
+      }
+      
+      const trimmedUsername = username.trim();
+      
       // 1. fetch request options (send username)
-      const { data } = await getLoginOptions({ username });
+      const { data } = await getLoginOptions({ username: trimmedUsername });
       console.log("[Login] getLoginOptions response:", data);
       const opts: any = data.publicKey ?? data;
 
@@ -88,18 +102,35 @@ export default function Login() {
       const assertion = await startAuthentication(opts);
       console.log("[Login] startAuthentication assertion:", assertion);
 
-      // 4. send to backend (include username like registration)
-      const resp = await finishLogin({ username, assertion });
-      console.log("[Login] finishLogin response:", resp);
-
-      // 5. Check if login was successful (backend uses session-based auth)
-      if (resp.status === 200 && resp.data === "success") {
-        // Backend uses session cookies, no need to store tokens
-        console.log("✅ Login successful, updating auth state and redirecting");
-        login(); // Update auth context
-        navigate("/dashboard");
+            // Step 4: Finish login with the server
+      console.log("📨 Sending assertion to server...");
+      const finishResponse = await finishLogin({
+        username: trimmedUsername,
+        assertion
+      });
+      
+      console.log("🔍 Login response:", finishResponse);
+      
+      // Backend returns plain text "success" for successful login
+      if (finishResponse.data === "success" || finishResponse.status === 200) {
+        console.log("✅ Login successful!");
+        setMessage("Login successful! Redirecting...");
+        
+        // Set authentication token for PrivateRoute compatibility
+        localStorage.setItem("authToken", "authenticated");
+        
+        // Set default user role if not provided
+        localStorage.setItem("role", "user");
+        
+        // Set authentication state
+        login();
+        
+        // Small delay to ensure state updates before navigation
+        setTimeout(() => {
+          navigate("/dashboard", { replace: true });
+        }, 100);
       } else {
-        throw new Error("Backend rejected the assertion.");
+        throw new Error("Login verification failed");
       }
     } catch (err: any) {
       setError(
@@ -190,6 +221,11 @@ export default function Login() {
                 placeholder="Username"
                 value={username}
                 onChange={e => setUsername(e.target.value)}
+                onKeyPress={e => {
+                  if (e.key === 'Enter' && !loading) {
+                    handleLogin();
+                  }
+                }}
                 style={{
                   width: '100%',
                   padding: '12px 16px',
@@ -214,6 +250,18 @@ export default function Login() {
                 >
                   <Alert severity="error" sx={{ mb: 3 }}>
                     {error}
+                  </Alert>
+                </motion.div>
+              )}
+              {message && (
+                <motion.div
+                  key="success-message"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0, transition: { duration: 0.3 } }}
+                  exit={{ opacity: 0, y: 16, transition: { duration: 0.2 } }}
+                >
+                  <Alert severity="success" sx={{ mb: 3 }}>
+                    {message}
                   </Alert>
                 </motion.div>
               )}
