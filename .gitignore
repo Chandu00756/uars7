@@ -1,0 +1,297 @@
+# UARS-7 Platform .gitignore
+# Comprehensive exclusions for Go, Node.js, Docker, and security
+
+# === SECURITY & SECRETS ===
+*.key
+*.pem
+*.crt
+*.p12
+*.keystore
+*.jks
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+secrets/
+keys/
+credentials/
+*.secret
+
+# === BINARIES & EXECUTABLES ===
+# Go binaries
+bin/
+dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# === GO SPECIFIC ===
+# Go vendor directories
+vendor/
+
+# Go build cache
+go-build/
+.cache/
+
+# Go module cache
+go.sum.backup
+
+# Go coverage files
+*.cover
+*.coverprofile
+coverage.txt
+coverage.html
+
+# Delve debugger
+__debug_bin
+
+# === NODE.JS & NPM ===
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.npm
+.eslintcache
+.node_repl_history
+*.tgz
+*.tar.gz
+.yarn-integrity
+.pnp
+.pnp.js
+
+# Build outputs
+build/
+dist/
+out/
+
+# Next.js
+.next/
+
+# Nuxt.js
+.nuxt/
+.output/
+
+# Vite
+.vite/
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# === DATABASE ===
+*.db
+*.sqlite
+*.sqlite3
+db.sqlite3
+database.db
+*.sql.backup
+
+# PostgreSQL
+postgresql/
+pg_log/
+
+# === LOGS ===
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# === DOCKER ===
+.dockerignore
+Dockerfile.dev
+Dockerfile.staging
+docker-compose.override.yml
+docker-compose.local.yml
+
+# === KUBERNETES ===
+*.kubeconfig
+kubeconfig
+.kube/
+secrets.yaml
+secret-*.yaml
+
+# === IDE & EDITORS ===
+# VSCode
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# GoLand / IntelliJ
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# === OPERATING SYSTEMS ===
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# === MONITORING & METRICS ===
+# Prometheus
+prometheus/
+data/
+tsdb/
+
+# Grafana
+grafana/data/
+grafana/logs/
+grafana.db
+
+# Jaeger
+jaeger/
+
+# === TESTING ===
+coverage/
+.nyc_output/
+junit.xml
+test-results/
+
+# === TEMPORARY FILES ===
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.orig
+
+# === TERRAFORM ===
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraform/
+.terraform.lock.hcl
+terraform.tfplan
+terraform.tfstate.backup
+
+# === HELM ===
+*.tgz
+charts/*.lock
+
+# === CERTIFICATES & CRYPTO ===
+*.p12
+*.pfx
+*.cer
+*.der
+*.csr
+
+# === UARS-7 SPECIFIC ===
+# Application logs
+Backend/uars-platform/logs/
+uars7-frontend/logs/
+
+# Build artifacts
+Backend/uars-platform/bin/
+
+# Development databases
+*.dev.db
+dev-data/
+
+# Local configuration overrides
+config.local.*
+local.yaml
+local.json
+
+# Generated documentation
+docs/build/
+docs/site/
+
+# Test data
+test-data/
+fixtures/
+
+# Backup files
+*.backup
+*.bak
+*.old
+
+# === ARCHIVES ===
+*.zip
+*.tar
+*.tar.gz
+*.tar.bz2
+*.rar
+*.7z
+
+# === MISC ===
+*.toc
+*.aux
+*.log
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# End of .gitignore
